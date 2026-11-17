@@ -23,6 +23,7 @@ GRADE = ("crop=1600:868:0:32,format=gbrp,split=2[a][b];[b]gblur=sigma=16,eq=brig
          "unsharp=5:5:0.5,vignette=PI/6,noise=alls=2:allf=t")
 STAMP = re.compile(r"\[(\d+\.\d+)\] \[[a-z_.]+\]: (.*)")
 BG = "0x0b0f14"
+REUSE = False  # --reuse: keep already rendered segments (delete a segment file to re-render only that one)
 
 
 class Take:
@@ -87,8 +88,14 @@ def header(subtitle: str) -> str:
 def clip(work: Path, i: int, take_main: Take, start: float, end: float, speed: float, caption: str, *,
          take_other: Take | None = None, other_start: float = 0.0, labels: tuple[str, str] = ("", "")) -> Path:
     out = work / f"seg{i:03d}.mp4"
-    cap, spd = work / f"cap{i}.txt", work / f"spd{i}.txt"
-    cap.write_text(caption)
+    if REUSE and out.exists():
+        return out
+    spd = work / f"spd{i}.txt"
+    cap_filters = []  # one drawtext per line: embedded newlines render a stray glyph in textfile mode
+    for k, line in enumerate(caption.split("\n")):
+        f = work / f"cap{i}_{k}.txt"
+        f.write_text(line)
+        cap_filters.append(f"drawtext=fontfile={BOLD}:textfile={f}:fontsize=34:fontcolor=white:x=(w-text_w)/2:y={880 + 50 * k}")
     spd.write_text(f"Speed x{speed:g}")
     dur = end - start
     if take_other is None:  # Gazebo (graded) + operator console
@@ -108,11 +115,37 @@ def clip(work: Path, i: int, take_main: Take, start: float, end: float, speed: f
                  f"drawtext=fontfile={BOLD}:text='{labels[1]}':fontsize=28:fontcolor=0xff6b5e:x=980:y=154")
         sub = "Same seed, same fires, same mission time"
     vf = (f"{panes},{header(sub)},drawtext=fontfile={BOLD}:textfile={spd}:fontsize=26:fontcolor=0xffc857:x=w-text_w-40:y=52,"
-          f"drawtext=fontfile={BOLD}:textfile={cap}:fontsize=36:fontcolor=white:x=(w-text_w)/2:y=900,"
+          f"{','.join(cap_filters)},"
           f"setpts=PTS/{speed},fps=30,format=yuv420p")
     run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo", "-shortest",
          "-filter_complex", vf + "[v]", "-map", "[v]", "-map", "2:a", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
          "-c:a", "aac", str(out)])
+    return out
+
+
+def pick_key_moments(key: list[tuple[float, str]], hazards_keep: tuple[int, ...] = (1, 3, 6)) -> list[tuple[float, str]]:
+    """About nine moments that tell the story: first discovery and a few later ones, the first replan, victims 1, 2 and the
+    last one, the first triage decision and the return to base."""
+    seen = {"hazard": 0, "victim": 0, "cancel": 0, "triage": 0}
+    victims_total = sum("Victim" in c for _, c in key)
+    out = []
+    for ts, cap in key:
+        if cap.startswith("The sensor discovers"):
+            seen["hazard"] += 1
+            keep = seen["hazard"] in hazards_keep
+        elif cap.startswith("The planner cancels"):
+            seen["cancel"] += 1
+            keep = seen["cancel"] == 1
+        elif cap.startswith("Victim"):
+            seen["victim"] += 1
+            keep = seen["victim"] in (1, 2, victims_total)
+        elif cap.startswith("Next:"):
+            seen["triage"] += 1
+            keep = seen["triage"] == 1
+        else:  # "All points inspected. Returning to base."
+            keep = True
+        if keep:
+            out.append((ts, cap))
     return out
 
 
@@ -133,6 +166,7 @@ def part_a_segments(t: Take, target_body_s: float) -> list[tuple[float, float, f
             label = "base" if m.group(1) == "base" else f"inspection point {m.group(2)}"
             key.append((ts, "All points inspected. Returning to base." if label == "base" else f"Next: {label}, the lowest-exposure safe route."))
             goals.append((ts, label))
+    key = pick_key_moments(key)
     first = next(ts for ts, text in t.events if text.startswith("Decision"))
     end = min(t.dur - 0.5, t.dur - 0.5 if t.meta.get("end_reason") != "base" else t.dur - 0.5)
     windows: list[list] = []
@@ -145,7 +179,7 @@ def part_a_segments(t: Take, target_body_s: float) -> list[tuple[float, float, f
             windows.append([a, b, [(ts, cap)]])
     slow_total = sum(b - a for a, b, _ in windows)
     fast_total = (end - first) - slow_total
-    speed = max(4.0, round(fast_total / max(10.0, target_body_s - slow_total / 2.0)))
+    speed = min(40.0, max(4.0, round(fast_total / max(10.0, target_body_s - slow_total / 2.0))))
 
     def goal_at(ts):
         label = "inspection point 1"
@@ -169,23 +203,16 @@ def part_a_segments(t: Take, target_body_s: float) -> list[tuple[float, float, f
     return segs
 
 
-def comparison_windows(main: Take, base: Take, count: int = 2, span_s: float = 18.0) -> list[tuple[float, float, float, float]]:
-    """Mission-time windows (start, end, baseline exposure gain, aegisnav exposure gain) where the baseline gains most."""
-    cands = []
-    m_end = base.timeline[-1][1]
-    m = 5.0
-    while m + span_s < m_end:
-        gain_b = base.exposure_at(m + span_s) - base.exposure_at(m)
-        cands.append((gain_b, m))
-        m += 2.0
-    chosen = []
-    for gain_b, m in sorted(cands, reverse=True):
-        if gain_b < 0.5 or any(abs(m - c) < span_s + 10 for _, c in chosen):
-            continue
-        chosen.append((gain_b, m))
-        if len(chosen) == count:
-            break
-    return sorted((m, m + span_s, g, main.exposure_at(m + span_s) - main.exposure_at(m)) for g, m in chosen)
+def comparison_windows(main: Take, base: Take, span_s: float = 18.0) -> list[tuple[float, float, float, float, float]]:
+    """One mission-time window around the baseline's first sample at risk >= 0.92: (start, end, baseline gain, aegisnav gain,
+    baseline peak risk). The window is chosen by that event, not by which robot looks better in it."""
+    hits = [ms for _, ms, _, risk, *_ in base.meta["timeline"] if risk >= 0.92]
+    if not hits:
+        raise SystemExit("the baseline take has no sample at risk >= 0.92; cannot build the comparison")
+    m0 = max(5.0, hits[0] - 9.0)
+    m1 = m0 + span_s
+    peak = max(risk for _, ms, _, risk, *_ in base.meta["timeline"] if m0 <= ms <= m1)
+    return [(m0, m1, base.exposure_at(m1) - base.exposure_at(m0), main.exposure_at(m1) - main.exposure_at(m0), peak)]
 
 
 def main() -> None:
@@ -195,8 +222,11 @@ def main() -> None:
     ap.add_argument("--slide", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--plan", action="store_true")
+    ap.add_argument("--reuse", action="store_true", help="skip segments that already exist in the work directory")
     ap.add_argument("--body-s", type=float, default=70.0)
     args = ap.parse_args()
+    global REUSE
+    REUSE = args.reuse
     main_t, base_t = Take(Path(args.main)), Take(Path(args.base))
     work = Path(args.main) / "edit_final"
     work.mkdir(exist_ok=True)
@@ -204,8 +234,8 @@ def main() -> None:
     cmp = comparison_windows(main_t, base_t)
     for s in segs:
         print(f"A {s[0]:7.1f}-{s[1]:7.1f} x{s[2]:g} {s[3]}")
-    for m0, m1, gb, ga in cmp:
-        print(f"B mission {m0:.0f}-{m1:.0f} s: baseline exposure +{gb:.1f}, AegisNav +{ga:.1f}")
+    for m0, m1, gb, ga, pk in cmp:
+        print(f"B mission {m0:.0f}-{m1:.0f} s: baseline exposure +{gb:.1f} (peak risk {pk:.2f}), AegisNav +{ga:.1f}")
     if args.plan:
         return
     parts = [card(work, "title", [("AegisNav", 110, BOLD, 330, "white"),
@@ -216,11 +246,12 @@ def main() -> None:
     parts += [clip(work, i, main_t, a, b, sp, cap) for i, (a, b, sp, cap) in enumerate(segs)]
     parts.append(card(work, "mid", [("Same fires. Same seed.", 80, BOLD, 400, "white"),
                                      ("Now the shortest-path robot, which ignores hazards, on the identical scenario.", 38, REG, 530, "0x9fb0c3")], 4))
-    for j, (m0, m1, gb, ga) in enumerate(cmp):
+    for j, (m0, m1, gb, ga, pk) in enumerate(cmp):
         a0, b0 = main_t.video_at_mission(m0), main_t.video_at_mission(m1)
         a1 = base_t.video_at_mission(m0)
-        cap = f"Mission time {m0:.0f}-{m1:.0f} s. Hazard exposure in this window: AegisNav {ga:.1f}, shortest-path robot {gb:.1f} risk·s."
-        parts.append(clip(work, 500 + j, main_t, a0, b0, 3.0, cap, take_other=base_t, other_start=a1,
+        cap = (f"Mission time {m0:.0f}-{m1:.0f} s, same fire. Peak risk met by the shortest-path robot: {pk:.2f}.\n"
+               f"Exposure in this window: AegisNav {ga:.1f}, shortest-path {gb:.1f} risk·s.")
+        parts.append(clip(work, 500 + j, main_t, a0, b0, 2.0, cap, take_other=base_t, other_start=a1,
                           labels=("AegisNav (onboard sensing)", "Shortest-path baseline")))
     parts.append(still(work, "results", Path(args.slide), 9))
     parts.append(card(work, "end", [("What this is, and is not", 56, BOLD, 150, "white"),

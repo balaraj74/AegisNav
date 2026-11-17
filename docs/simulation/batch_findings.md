@@ -19,7 +19,7 @@ Source numbers: `docs/simulation/batch_results.md` (regenerate with `tools/analy
 | Mission time, simulated s | 295 ± 6 | 313 ± 19 |
 | Distance, m | 127 ± 3 | 123 ± 29 |
 
-- **Exposure:** on identical seeds AegisNav's exposure was lower by 10.1 risk·s on average (95% bootstrap CI −15.0 to −4.7). It was lower in five of the six seeds (by 5.1 to 18.6 risk·s). In seed 5 the baseline's exposure was *lower* (7.1 against 8.3), but that run stopped after 3 of 5 points, so it did less of the mission; excluding that seed the mean difference is −12.3 risk·s.
+- **Exposure:** on identical seeds AegisNav's exposure was lower by 10.1 risk·s on average (95% bootstrap CI −14.9 to −4.7). It was lower in five of the six seeds (by 5.1 to 18.6 risk·s). In seed 5 the baseline's exposure was *lower* (7.1 against 8.3), but that run stopped after 3 of 5 points, so it did less of the mission; excluding that seed the mean difference is −12.3 risk·s.
 - **Deadly-zone entries:** the baseline touched a cell at risk ≥ 0.92 in every run, briefly (1.5–2.0 s, i.e. cutting through the edge of a hazard region). AegisNav did not in any run, while discovering the hazards with its own 4 m line-of-sight sensor.
 - **Cost of caution:** AegisNav was not slower or longer in these runs (295 s vs 313 s; 127 m vs 123 m), so avoiding hazard did not cost mission time here.
 - **Reliability of the integrated stack:** all six AegisNav sensing runs and five of six baseline runs completed. There were no stale-pose stops in any run. One AegisNav run (seed 2) had a single transient controller failure ("collision ahead" 11 times, one failed `FollowPath`) and recovered by replanning; no AegisNav run latched the fault. The slowest planner cycle was 1.8 s under three parallel simulations.

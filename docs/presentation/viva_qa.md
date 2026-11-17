@@ -38,7 +38,7 @@ Answers are written so every statement can be backed by the repository. Where so
 
 **How do you know it works?**
 - 189 unit tests (core 133, ROS adapters 40, assets 16) plus 166 ROS package tests in a clean Jazzy container, run by CI.
-- A Gazebo + Nav2 batch study: 6 matched seeds of full headless missions with seeded random fires, measured against the *real* hazard field. AegisNav with onboard sensing completed 6/6 and never entered a cell at risk ≥ 0.92 (0/6, 95% CI 0–39%); the shortest-path baseline entered one in 6/6 runs, briefly (1.5–2.0 s each), and completed 5/6. Mean exposure 6.7 ± 2.7 against 16.8 ± 6.2 risk·s; paired difference −10.1 (95% bootstrap CI −15.0 to −4.7).
+- A Gazebo + Nav2 batch study: 6 matched seeds of full headless missions with seeded random fires, measured against the *real* hazard field. AegisNav with onboard sensing completed 6/6 and never entered a cell at risk ≥ 0.92 (0/6, 95% CI 0–39%); the shortest-path baseline entered one in 6/6 runs, briefly (1.5–2.0 s each), and completed 5/6. Mean exposure 6.7 ± 2.7 against 16.8 ± 6.2 risk·s; paired difference −10.1 (95% bootstrap CI −14.9 to −4.7).
 - An earlier 20-seed kinematic study (corridor map): AegisNav never entered a cell at or above the hard limit; the shortest-path baseline did in every trial.
 
 **What is the baseline?** The same planner with hazard and uncertainty weights set to 0, a hard limit of 0.99 and no mission policy (a shortest path). It answers "does hazard awareness help?", not "is Nav2's planner worse?".
@@ -88,7 +88,7 @@ Answers are written so every statement can be backed by the repository. Where so
 
 ## 9. Hard questions
 
-**"Your fire isn't real, so what did you prove?"** That, *under a configurable hazard model*, planning over a forecast with an honest sensor model reduced simulated exposure compared with a shortest-path robot in 6 matched full missions (−10.1 risk·s, CI −15.0 to −4.7), and that the integrated stack runs reliably enough to measure. Not that it would rescue anyone.
+**"Your fire isn't real, so what did you prove?"** That, *under a configurable hazard model*, planning over a forecast with an honest sensor model reduced simulated exposure compared with a shortest-path robot in 6 matched full missions (−10.1 risk·s, CI −14.9 to −4.7), and that the integrated stack runs reliably enough to measure. Not that it would rescue anyone.
 
 **"Isn't this just A* with a cost map?"** The A* is the part we can prove optimal. The additions are the time dimension, the return-feasibility check, the belief from a limited sensor, confidence-driven decisions with reasons, and an evaluation harness that measures them in the real stack.
 

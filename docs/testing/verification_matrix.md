@@ -148,7 +148,7 @@ Rendering: Intel iGPU via `/dev/dri` (Mesa iris), headless sensors; GUI runs on 
 |---|---|---|
 | Full missions, AegisNav sensing + triage, 6 seeds | 6/6 complete (all 5 points, back at base); 0/6 entered risk ≥ 0.92; exposure 6.7 ± 2.7 risk·s | `docs/simulation/batch_results.md` |
 | Full missions, shortest-path baseline, same 6 seeds | 5/6 complete; 6/6 entered risk ≥ 0.92 (1.5–2.0 s each); exposure 16.8 ± 6.2; 1 stuck (controller "collision ahead" near courtyard goal) | same |
-| Paired exposure difference, AegisNav − baseline | −10.1 risk·s, 95% bootstrap CI −15.0 to −4.7 (lower in 5 of 6 seeds; seed 5's baseline stopped early) | same, `docs/simulation/batch_findings.md` |
+| Paired exposure difference, AegisNav − baseline | −10.1 risk·s, 95% bootstrap CI −14.9 to −4.7 (lower in 5 of 6 seeds; seed 5's baseline stopped early) | same, `docs/simulation/batch_findings.md` |
 | Stale-pose stops | 0 in all runs | run logs |
 | Omniscient and no-triage configurations | 2 seeds each only: **too few to compare** | same |
 | Not done | reactive (current-layer) baseline; more than 6 seeds; hysteresis ablation; runs on the laptop GPU | ADR-0009 |
