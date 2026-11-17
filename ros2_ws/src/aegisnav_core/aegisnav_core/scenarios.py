@@ -197,9 +197,9 @@ def rescue_compound_scenario() -> Scenario:
         start=building.start, target=waypoints[0], base=building.base,
         refuges=(*building.refuges, Cell(68, 3), Cell(5, 40)),
         sources=sources, initial_risk=tuple(initial), initial_uncertainty=tuple(uncertainty),
-        # 2 s layers x 90 = 180 s; the longest leg plus its return to base is ~56 layers at 0.6 m/s
-        # (test_scenarios). Synthetic-model parameters as in rescue_building.
-        forecast_config=ForecastConfig(horizon_steps=90, time_step_s=2.0, spread_rate=0.15, decay_rate=0.02,
+        # 2 s layers x 120 = 240 s: with a 2-cell hazard standoff the longest leg plus its return can exceed 180 s
+        # (seen on seed 1). Synthetic-model parameters as in rescue_building.
+        forecast_config=ForecastConfig(horizon_steps=120, time_step_s=2.0, spread_rate=0.15, decay_rate=0.02,
                                        uncertainty_growth=0.018),
         waypoints=waypoints, victims=victims, props=tuple(props), min_passage_cells=3,
     )

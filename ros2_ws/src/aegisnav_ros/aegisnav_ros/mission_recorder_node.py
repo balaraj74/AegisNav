@@ -75,6 +75,8 @@ class MissionRecorderNode(Node):
         self._max_still_s = 0.0
         self._timeline: list[list[float]] = []  # [wall_epoch_s, mission_s, exposure_risk_s, risk_here, x, y] every 2 s
         self._next_sample = 0.0
+        self._min_fire_m = math.inf  # closest the robot got to any cell at true risk >= 0.92
+        self._near_fire_s = 0.0      # seconds within 1.0 m of such a cell
         self.create_subscription(OccupancyGrid, "/aegisnav/planning_map", self._on_map, MAP_QOS)
         self.create_subscription(HazardForecast, str(self.get_parameter("truth_topic").value), self._on_truth, 1)
         self.create_subscription(String, "/aegisnav/decision", self._on_decision, 10)
@@ -141,12 +143,25 @@ class MissionRecorderNode(Node):
             cell = world_to_cell(self._grid, x, y)
             risk = self._truth[self._grid.index(cell)] / 100.0 if cell is not None else 0.0
             self._metrics.update(t, x, y, max(0.0, min(1.0, risk)))
+            self._track_fire_distance(x, y)
             if t >= self._next_sample:
                 self._next_sample = t + 2.0
                 self._timeline.append([round(time.time(), 2), round(self._mission_s(), 1),
                                        round(self._metrics.exposure_risk_s, 2), round(risk, 3), round(x, 2), round(y, 2)])
         self._track_progress(t, x, y)
         self._check_done(t)
+
+    def _track_fire_distance(self, x: float, y: float) -> None:
+        """Distance from the robot's position to the nearest cell centre at true risk >= 0.92 (what a viewer sees as
+        'driving into the fire'); sampled with the 0.5 s timer."""
+        g = self._grid
+        burning = [i for i, v in enumerate(self._truth) if v >= 92 and i not in g.blocked]
+        if not burning:
+            return
+        nearest = min(math.hypot(x - g.cell_center_world(g.cell(i))[0], y - g.cell_center_world(g.cell(i))[1]) for i in burning)
+        self._min_fire_m = min(self._min_fire_m, nearest)
+        if nearest < 1.0:
+            self._near_fire_s += 0.5
 
     def _track_progress(self, t: float, x: float, y: float) -> None:
         radius = float(self.get_parameter("stuck_radius_m").value)
@@ -213,6 +228,8 @@ class MissionRecorderNode(Node):
             "decisions": self._actions, "reason_codes": self._reasons,
             "routes_sent": self._sends, "routes_cancelled": self._cancels,
             "longest_still_s": round(self._max_still_s, 1),
+            "min_fire_distance_m": None if math.isinf(self._min_fire_m) else round(self._min_fire_m, 2),
+            "time_within_1m_of_fire_s": round(self._near_fire_s, 1),
             "timeline": self._timeline,
         }
         directory = os.path.dirname(self._out) or "."

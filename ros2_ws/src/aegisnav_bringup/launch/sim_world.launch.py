@@ -123,6 +123,7 @@ def _setup(context):
             "wall_clearance_penalty_m": str(preset["wall_clearance_penalty_m"]),
             "straight_near_obstacles": str(preset["straight_near_obstacles"]).lower(),
             "inflate_obstacles_cells": str(preset["inflate_obstacles_cells"]),
+            "hazard_standoff_cells": str(preset.get("hazard_standoff_cells", 0)),
             "triage": (str(preset.get("triage", False)).lower() if LaunchConfiguration("triage").perform(context) == "preset"
                        else LaunchConfiguration("triage").perform(context)),
             "ignition_seed": LaunchConfiguration("ignition_seed"), "ignition_count": LaunchConfiguration("ignition_count"),

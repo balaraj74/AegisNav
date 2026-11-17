@@ -28,6 +28,7 @@ rescue_building:
   wall_clearance_penalty_m: 1.0   # strong enough to centre the route in 2 m doorways
   straight_near_obstacles: true   # long robot: no turning inside doorways
   inflate_obstacles_cells: 1      # hard margin: robot centre never in a wall-touching cell
+  hazard_standoff_cells: 2        # keep >= 1.5 m (centre to burning cell) from any cell at risk >= 0.92
 rescue_compound:                  # the building plus courtyard, yard and warehouse (36 x 22 m), 5 inspection points
   scenario_name: rescue_compound
   world_sdf: worlds/rescue_compound.sdf
@@ -42,4 +43,5 @@ rescue_compound:                  # the building plus courtyard, yard and wareho
   wall_clearance_penalty_m: 1.0
   straight_near_obstacles: true
   inflate_obstacles_cells: 1
+  hazard_standoff_cells: 2        # keep >= 1.5 m (centre to burning cell) from any cell at risk >= 0.92
   triage: true                    # next inspection point = lowest-exposure safe route (scenario node)

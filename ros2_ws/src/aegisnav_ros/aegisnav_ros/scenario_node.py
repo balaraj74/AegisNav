@@ -95,7 +95,8 @@ class ScenarioNode(Node):
         self.declare_parameter("triage", False)
         # Planner settings for triage routes; launch passes the same values as to the planner.
         for name, default in (("nominal_speed_mps", 0.35), ("wall_clearance_cells", 1), ("wall_clearance_penalty_m", 0.3),
-                              ("straight_near_obstacles", False), ("inflate_obstacles_cells", 0)):
+                              ("straight_near_obstacles", False), ("inflate_obstacles_cells", 0),
+                              ("hazard_standoff_cells", 0)):
             self.declare_parameter(name, default)
         self._triage = bool(self.get_parameter("triage").value)
         self._remaining: list[Cell] = list(self._goals)
@@ -156,6 +157,7 @@ class ScenarioNode(Node):
             wall_clearance_penalty_m=float(self.get_parameter("wall_clearance_penalty_m").value),
             straight_near_obstacles=bool(self.get_parameter("straight_near_obstacles").value),
             inflate_obstacles_cells=int(self.get_parameter("inflate_obstacles_cells").value),
+            hazard_standoff_cells=int(self.get_parameter("hazard_standoff_cells").value),
         )
         return triage_next_goal(cell, candidates, self._scn.base, self._grid, frames, cfg,
                                 time_step_s=float(self._forecast.time_step_s))

@@ -100,6 +100,16 @@ def main() -> None:
         cx = [r["data"]["routes_cancelled"] for r in fin]
         lines.append(f"| {MODE_LABEL[m]} (n={len(fin)}) | {fmt_ms(col('exposure_risk_s'), '', 1)} | {fmt_ms(col('time_near_s'), '', 1)} | "
                      f"{fmt_ms(col('time_in_s'), '', 1)} | {fmt_ms(col('distance_m'), '', 0)} | {fmt_ms(mt, '', 0)} | {fmt_ms(cx, '', 1)} |")
+    lines += ["", "## Closeness to fire (distance from the robot to the nearest cell at true risk ≥ 0.92)", "",
+              "| Mode | Runs | Closest approach per run, m (min / median / max) | Runs that came within 1.0 m | Seconds within 1.0 m per run (mean) |", "|---|---|---|---|---|"]
+    for m, runs in modes.items():
+        d = [r["data"] for r in runs if r.get("data") and r["data"].get("min_fire_distance_m") is not None]
+        if not d:
+            continue
+        mins = sorted(x["min_fire_distance_m"] for x in d)
+        within = sum(1 for x in d if x["min_fire_distance_m"] < 1.0)
+        lines.append(f"| {MODE_LABEL[m]} | {len(d)} | {mins[0]:.2f} / {mins[len(mins) // 2]:.2f} / {mins[-1]:.2f} | {within}/{len(d)} | "
+                     f"{sum(x['time_within_1m_of_fire_s'] for x in d) / len(d):.1f} |")
     lines += ["", "## Paired comparisons on identical seeds (exposure, risk·s; negative = first mode is lower)", "",
               "| Comparison | Seeds | Mean difference | 95% bootstrap CI |", "|---|---|---|---|"]
     pairs = [("sensing", "baseline"), ("omniscient", "baseline"), ("sensing", "omniscient"), ("sensing", "sensing_notriage")]

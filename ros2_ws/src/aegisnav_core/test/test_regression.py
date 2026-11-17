@@ -157,6 +157,60 @@ class PlannerRegressionTests(unittest.TestCase):
             self.assertLessEqual(h[g.index(start)], plan.total_cost + 1e-9)
             self.assertLess(h[g.index(start)], math.inf)
 
+    def test_hazard_standoff_keeps_the_route_away_and_allows_escape(self):
+        # 13 x 11 open room, a fire (risk 0.95) in the middle of the direct line from (0,5) to (12,5).
+        g = GridMap(13, 11)
+        risk = [0.0] * g.size
+        risk[g.index(Cell(6, 5))] = 0.95
+        fr = [HazardFrame(13, 11, tuple(risk), (0.1,) * g.size, k, float(k)) for k in range(120)]
+        start, goal = Cell(0, 5), Cell(12, 5)
+
+        def nearest(plan):
+            return min(max(abs(c.x - 6), abs(c.y - 5)) for c in plan.cells)
+
+        base = PlannerConfig(hazard_weight=0.0, uncertainty_weight=0.0)  # distance only: would hug the fire
+        passing = RiskAwareAStar().plan(g, fr, start, goal, base, time_step_s=1.0)
+        self.assertTrue(passing.success)
+        self.assertLessEqual(nearest(passing), 1)
+        for radius in (1, 2, 3):
+            cfg = PlannerConfig(hazard_weight=0.0, uncertainty_weight=0.0, hazard_standoff_cells=radius)
+            plan = RiskAwareAStar().plan(g, fr, start, goal, cfg, time_step_s=1.0)
+            self.assertTrue(plan.success, radius)
+            self.assertGreater(nearest(plan), radius, radius)  # never enters the zone
+            self.assertTrue(evaluate_route(g, fr, plan.cells, cfg, time_step_s=1.0).success)
+            self.assertFalse(evaluate_route(g, fr, passing.cells, cfg, time_step_s=1.0).success)  # the old route is rejected
+        # Starting inside the zone: the robot may move within it and out of it.
+        cfg = PlannerConfig(hazard_weight=0.0, uncertainty_weight=0.0, hazard_standoff_cells=2)
+        self.assertTrue(RiskAwareAStar().plan(g, fr, Cell(5, 5), Cell(0, 5), cfg, time_step_s=1.0).success)
+        # A goal inside the zone cannot be entered from outside: no route (the mission policy then handles it).
+        self.assertFalse(RiskAwareAStar().plan(g, fr, Cell(0, 5), Cell(5, 5), cfg, time_step_s=1.0).success)
+        # A room the zone closes completely has no route either.
+        g2 = GridMap(11, 5)
+        risk2 = [0.0] * g2.size
+        risk2[g2.index(Cell(5, 2))] = 0.95
+        fr2 = [HazardFrame(11, 5, tuple(risk2), (0.1,) * g2.size, k, float(k)) for k in range(60)]
+        self.assertFalse(RiskAwareAStar().plan(g2, fr2, Cell(0, 2), Cell(10, 2), cfg, time_step_s=1.0).success)
+
+    def test_hazard_standoff_does_not_spread_through_walls(self):
+        # A wall at x=5 with a fire right behind it (x=6): the corridor cells at x=4 are within 2 cells by
+        # distance but not through free space, so the standoff must not close them.
+        g0 = GridMap(11, 3)
+        g = GridMap(11, 3, 1.0, frozenset({g0.index(Cell(5, 0)), g0.index(Cell(5, 1)), g0.index(Cell(5, 2))}))
+        risk = [0.0] * g.size
+        risk[g.index(Cell(6, 1))] = 0.95
+        fr = [HazardFrame(11, 3, tuple(risk), (0.1,) * g.size, k, float(k)) for k in range(30)]
+        from aegisnav_core.planning import _standoff_zones
+        zone = _standoff_zones(g, fr, 2, 0.92)[0]
+        self.assertIn(g.index(Cell(7, 1)), zone)
+        self.assertNotIn(g.index(Cell(4, 1)), zone)
+        self.assertNotIn(g.index(Cell(5, 1)), zone)
+
+    def test_hazard_standoff_validation(self):
+        for bad in (-1, 5):
+            with self.assertRaises(ValueError):
+                PlannerConfig(hazard_standoff_cells=bad)
+        self.assertEqual(PlannerConfig(hazard_standoff_cells=4).hazard_standoff_cells, 4)
+
     def test_invalid_time_step(self):
         g = GridMap(3, 3)
         with self.assertRaises(ValueError):

@@ -78,6 +78,8 @@ class RiskPlannerNode(Node):
         self.declare_parameter("wall_clearance_cells", 1)
         self.declare_parameter("straight_near_obstacles", False)
         self.declare_parameter("inflate_obstacles_cells", 0)
+        # Keep this many cells (0.5 m each on the rescue grids) from any cell at or above the hard risk threshold.
+        self.declare_parameter("hazard_standoff_cells", 0)
         self.declare_parameter("minimum_continue_confidence", 0.55)
         self.declare_parameter("critical_confidence", 0.30)
         # After degraded confidence, continue only once it recovers to this (hysteresis, no flapping).
@@ -157,6 +159,7 @@ class RiskPlannerNode(Node):
             wall_clearance_cells=int(self.get_parameter("wall_clearance_cells").value),
             straight_near_obstacles=bool(self.get_parameter("straight_near_obstacles").value),
             inflate_obstacles_cells=int(self.get_parameter("inflate_obstacles_cells").value),
+            hazard_standoff_cells=int(self.get_parameter("hazard_standoff_cells").value),
         )
         self._planner_config = planner_cfg
         self._baseline = bool(self.get_parameter("baseline_distance_only").value)

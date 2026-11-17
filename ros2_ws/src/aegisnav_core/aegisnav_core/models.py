@@ -173,6 +173,11 @@ class PlannerConfig:
     # Hard configuration-space margin: cells within this Chebyshev distance of an obstacle are not
     # traversable (except as start or goal). 0 = point robot; 1 suits a ~0.6 m-wide robot on 0.5 m cells.
     inflate_obstacles_cells: int = 0
+    # Standoff from hazards: a move may not ENTER a cell within this many cells (through free space) of a cell at or
+    # above hard_risk_threshold in the forecast layer it arrives in, unless it starts inside that zone (so the
+    # robot can always leave). 0 = only the hard-threshold cells themselves are forbidden. 2 cells = 1 m on a
+    # 0.5 m grid, about a robot half-length plus a flame radius. A simulation rule, not a validated safety distance.
+    hazard_standoff_cells: int = 0
 
     def __post_init__(self) -> None:
         if self.hazard_weight < 0 or self.uncertainty_weight < 0:
@@ -183,6 +188,8 @@ class PlannerConfig:
             raise ValueError("wall_clearance_cells must be in [1, 5]")
         if not 0 <= self.inflate_obstacles_cells <= 3:
             raise ValueError("inflate_obstacles_cells must be in [0, 3]")
+        if not 0 <= self.hazard_standoff_cells <= 4:
+            raise ValueError("hazard_standoff_cells must be in [0, 4]")
         if not 0.0 < self.hard_risk_threshold <= 1.0:
             raise ValueError("hard_risk_threshold must be in (0, 1]")
         if self.nominal_speed_mps <= 0:

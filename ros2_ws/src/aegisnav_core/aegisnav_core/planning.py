@@ -61,6 +61,7 @@ class RiskAwareAStar:
         risk_layers = [frame.risk for frame in frames]
         uncertainty_layers = [frame.uncertainty for frame in frames]
         resolution = grid.resolution_m
+        zones = _standoff_zones(grid, frames, config.hazard_standoff_cells, config.hard_risk_threshold)
         if config.hazard_weight > 0 or config.uncertainty_weight > 0:
             rates = _min_rates(frames, config.hazard_weight, config.uncertainty_weight)
             heuristic = _cost_to_go(grid, adjacency, rates, goal_idx, config, near)
@@ -104,7 +105,8 @@ class RiskAwareAStar:
                 if config.straight_near_obstacles and length_cells > 1.0 and (cell_idx in near or nxt_idx in near):
                     continue
                 step = _edge_cost(risk_layers, uncertainty_layers, now_s, nxt_idx, length_cells * resolution,
-                                  config, time_step_s, clearance_weight=near.get(nxt_idx, 0))
+                                  config, time_step_s, clearance_weight=near.get(nxt_idx, 0),
+                                  zones=zones, from_idx=cell_idx)
                 if step is None:
                     continue
                 next_state = (nxt_idx, step[1])
@@ -126,7 +128,7 @@ class RiskAwareAStar:
         states.reverse()
         cells = tuple(grid.cell(state[0]) for state in states)
         start_s = start_time_step * time_step_s
-        scored = _score(grid, risk_layers, uncertainty_layers, cells, config, time_step_s, start_s, near)
+        scored = _score(grid, risk_layers, uncertainty_layers, cells, config, time_step_s, start_s, near, zones)
         if isinstance(scored, str):
             # A state's best path changed after its successors were expanded and the rescored route
             # now crosses the threshold: fail closed rather than return an unchecked route.
@@ -238,12 +240,57 @@ def _min_rates(frames: Sequence[HazardFrame], hw: float, uw: float) -> list[floa
     return rates
 
 
+@lru_cache(maxsize=4096)
+def _within(grid: GridMap, idx: int, radius: int) -> tuple[int, ...]:
+    """Free cells reachable from `idx` in at most `radius` 8-neighbour steps through free space (idx included).
+    Walls stop the spread, so a fire does not close the room on the other side of a wall."""
+    seen, frontier = {idx}, [idx]
+    for _ in range(radius):
+        nxt = []
+        for i in frontier:
+            c = grid.cell(i)
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    n = Cell(c.x + dx, c.y + dy)
+                    if grid.contains(n) and not grid.is_blocked(n) and (j := grid.index(n)) not in seen:
+                        seen.add(j)
+                        nxt.append(j)
+        frontier = nxt
+    return tuple(sorted(seen))
+
+
+_ZONE_CACHE: list = []  # [(frames, radius, threshold, zones)]: one forecast is planned on several times per cycle
+
+
+def _standoff_zones(grid: GridMap, frames: Sequence[HazardFrame], radius: int, threshold: float):
+    """Per forecast layer: frozenset of cell indices within `radius` cells of a cell at risk >= `threshold`.
+    None when radius is 0 (feature off). Cached for the most recent `frames` object."""
+    if radius <= 0:
+        return None
+    if _ZONE_CACHE and _ZONE_CACHE[0][0] is frames and _ZONE_CACHE[0][1:3] == (radius, threshold):
+        return _ZONE_CACHE[0][3]
+    memo: dict[tuple[int, ...], frozenset[int]] = {}
+    zones = []
+    for frame in frames:
+        sources = tuple(i for i, v in enumerate(frame.risk) if v >= threshold)
+        if sources not in memo:
+            members: set[int] = set()
+            for i in sources:
+                members.update(_within(grid, i, radius))
+            memo[sources] = frozenset(members)
+        zones.append(memo[sources])
+    _ZONE_CACHE[:] = [(frames, radius, threshold, zones)]
+    return zones
+
+
 def _edge_cost(
     risk_layers: Sequence[Sequence[float]], uncertainty_layers: Sequence[Sequence[float]], start_s: float,
     nxt_idx: int, distance_m: float, config: PlannerConfig, time_step_s: float, *, clearance_weight: int = 0,
+    zones=None, from_idx: int = -1,
 ) -> tuple[float, int, float, float, float, float] | None:
     """(arrival time s, arrival layer, edge cost, mean risk, mean uncertainty, peak risk) for moving into
-    cell `nxt_idx` starting at `start_s`, or None if any sampled layer crosses the hard threshold.
+    cell `nxt_idx` starting at `start_s`, or None if any sampled layer crosses the hard threshold or the move
+    enters a hazard standoff zone from outside it (`zones`, see PlannerConfig.hazard_standoff_cells).
 
     Single definition of the risk objective, shared by search and route evaluation. Sampled layers:
     from the first layer after the start time up to the first layer at or after the arrival time
@@ -259,12 +306,16 @@ def _edge_cost(
         risk = peak = risk_layers[first][nxt_idx]
         if risk >= config.hard_risk_threshold:
             return None
+        if zones is not None and nxt_idx in zones[first] and from_idx not in zones[first]:
+            return None
         uncertainty = uncertainty_layers[first][nxt_idx]
     else:
         layers = range(first, arrival_layer + 1)
         values = [risk_layers[layer][nxt_idx] for layer in layers]
         peak = max(values)
         if peak >= config.hard_risk_threshold:
+            return None
+        if zones is not None and any(nxt_idx in zones[k] and from_idx not in zones[k] for k in layers):
             return None
         risk = sum(values) / len(values)
         uncertainty = sum(uncertainty_layers[layer][nxt_idx] for layer in layers) / len(values)
@@ -283,14 +334,14 @@ class _Score:
 
 
 def _score(grid: GridMap, risk_layers, uncertainty_layers, cells: Sequence[Cell], config: PlannerConfig,
-           time_step_s: float, start_s: float, near: dict[int, int]) -> _Score | str:
+           time_step_s: float, start_s: float, near: dict[int, int], zones=None) -> _Score | str:
     """Walk a legal-looking route with `_edge_cost`; a reason string if a step is rejected."""
     now_s, cost, distance, exposure, uncertainty_exposure, peak = start_s, 0.0, 0.0, 0.0, 0.0, 0.0
     for prev, cell in zip(cells, cells[1:]):
         length_m = math.hypot(cell.x - prev.x, cell.y - prev.y) * grid.resolution_m
         idx = grid.index(cell)
         step = _edge_cost(risk_layers, uncertainty_layers, now_s, idx, length_m, config, time_step_s,
-                          clearance_weight=near.get(idx, 0))
+                          clearance_weight=near.get(idx, 0), zones=zones, from_idx=grid.index(prev))
         if step is None:
             return "route_crosses_hard_threshold"
         duration_s = step[0] - now_s
@@ -335,7 +386,8 @@ def evaluate_route(
         if (config.straight_near_obstacles and legal[cell] > 1.0
                 and (grid.index(prev) in near or grid.index(cell) in near)):
             return RoutePlan((), False, "route_step_illegal")
-    scored = _score(grid, risk_layers, uncertainty_layers, cells, config, time_step_s, 0.0, near)
+    zones = _standoff_zones(grid, frames, config.hazard_standoff_cells, config.hard_risk_threshold)
+    scored = _score(grid, risk_layers, uncertainty_layers, cells, config, time_step_s, 0.0, near, zones)
     if isinstance(scored, str):
         return RoutePlan((), False, scored)
     peak = max(frames[0].at(cells[0])[0], scored.max_risk_encountered)

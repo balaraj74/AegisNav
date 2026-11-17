@@ -1,0 +1,20 @@
+Starting >>> aegisnav_core
+Starting >>> aegisnav_msgs
+Finished <<< aegisnav_core [0.90s]
+--- stderr: aegisnav_msgs
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CATKIN_INSTALL_INTO_PREFIX_ROOT
+    CATKIN_SYMLINK_INSTALL
+
+
+---
+Finished <<< aegisnav_msgs [4.50s]
+Starting >>> aegisnav_ros
+Finished <<< aegisnav_ros [0.90s]
+Starting >>> aegisnav_bringup
+Finished <<< aegisnav_bringup [1.92s]
+
+Summary: 4 packages finished [7.40s]
+  1 package had stderr output: aegisnav_msgs

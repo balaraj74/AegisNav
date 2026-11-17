@@ -27,6 +27,7 @@ def generate_launch_description():
         DeclareLaunchArgument("scenario_name", default_value="", description="Core scenario for mission geometry/hazards."),
         DeclareLaunchArgument("nominal_speed_mps", default_value="0.35", description="Planner speed model (m/s)."),
         DeclareLaunchArgument("inflate_obstacles_cells", default_value="0", description="Planner hard wall margin (cells)."),
+        DeclareLaunchArgument("hazard_standoff_cells", default_value="0", description="Planner standoff from hazards (cells)."),
         DeclareLaunchArgument("straight_near_obstacles", default_value="false", description="No diagonal moves near walls."),
         DeclareLaunchArgument("wall_clearance_penalty_m", default_value="0.3", description="Planner wall-clearance penalty (m)."),
         DeclareLaunchArgument("wall_clearance_cells", default_value="1", description="Planner wall-clearance radius (cells)."),
@@ -68,6 +69,7 @@ def generate_launch_description():
                          "wall_clearance_penalty_m": ParameterValue(LaunchConfiguration("wall_clearance_penalty_m"), value_type=float),
                          "straight_near_obstacles": ParameterValue(LaunchConfiguration("straight_near_obstacles"), value_type=bool),
                          "inflate_obstacles_cells": ParameterValue(LaunchConfiguration("inflate_obstacles_cells"), value_type=int),
+                         "hazard_standoff_cells": ParameterValue(LaunchConfiguration("hazard_standoff_cells"), value_type=int),
                          # With sensing, confidence is estimated by the sensor node instead of scripted.
                          "publish_confidence": ParameterValue(
                              PythonExpression(["'", LaunchConfiguration("sensing"), "' != 'true'"]), value_type=bool)}],
@@ -113,6 +115,7 @@ def generate_launch_description():
                 "wall_clearance_penalty_m": ParameterValue(LaunchConfiguration("wall_clearance_penalty_m"), value_type=float),
                 "straight_near_obstacles": ParameterValue(LaunchConfiguration("straight_near_obstacles"), value_type=bool),
                 "inflate_obstacles_cells": ParameterValue(LaunchConfiguration("inflate_obstacles_cells"), value_type=int),
+                "hazard_standoff_cells": ParameterValue(LaunchConfiguration("hazard_standoff_cells"), value_type=int),
                 "baseline_distance_only": ParameterValue(LaunchConfiguration("baseline"), value_type=bool),
                 "slow_cycle_warn_s": ParameterValue(LaunchConfiguration("slow_cycle_warn_s"), value_type=float),
             }],
