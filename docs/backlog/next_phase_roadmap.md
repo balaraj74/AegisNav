@@ -10,7 +10,7 @@ Goal: make AegisNav measurably more credible, not just more impressive-looking. 
 - **Fix known rough edges:**
   - console banner says "heading to the victim" for points without a victim;
   - fire-truck textures missing (`suv.png`);
-  - `SetColorRange is currently disabled` on this Gazebo version (flat fire colours).
+  - (checked) `SetColorRange is currently disabled` only logs a warning: the recorded flames render orange and the gas green.
 - **CI:** GitHub Actions running `run_core_tests.sh`, `verify_repo.sh`, and `colcon build/test` in the `aegisnav-jazzy` image.
 
 ## Phase 1 — Prove reliability and the research claim (3–4 days)

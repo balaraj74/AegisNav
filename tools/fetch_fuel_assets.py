@@ -7,6 +7,7 @@ Network is needed only here (never at simulation runtime). For every model the s
   * checks the archive SHA-256 against tools/fuel_assets.lock.json (or records it with --write-lock),
   * extracts it to ros2_ws/src/aegisnav_bringup/models/<dir>, the directory name its mesh URIs expect,
   * removes <include> elements that point to the internet (they would download at runtime),
+  * removes texture maps that point at other Fuel models (missing from the archive),
   * strips whitespace before the XML declaration (invalid XML; Gazebo tolerates it, parsers do not).
 Usage: python3 tools/fetch_fuel_assets.py [--write-lock] [--only "Fuel name"]
 """
@@ -86,6 +87,19 @@ def _localize_textures(model_dir: Path) -> None:
             mesh.write_text(fixed, encoding="utf-8")
 
 
+FOREIGN_MAP = re.compile(r"^\s*map_K[ad]\s+model://[^\n]*\n", re.M)
+
+
+def _strip_foreign_textures(model_dir: Path) -> None:
+    """Drop texture maps that point at *other* Fuel models (model://suv/...): they are not in the archive, Gazebo
+    logs an error and renders them black. The material's own Kd colour is used instead."""
+    for mtl in model_dir.glob("meshes/*.mtl"):
+        text = mtl.read_text(encoding="utf-8", errors="ignore")
+        fixed = FOREIGN_MAP.sub("", text)
+        if fixed != text:
+            mtl.write_text(fixed, encoding="utf-8")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--write-lock", action="store_true", help="record archive hashes instead of verifying them")
@@ -120,6 +134,7 @@ def main() -> int:
             if cleaned != text:
                 sdf.write_text(cleaned, encoding="utf-8")
         _localize_textures(target)
+        _strip_foreign_textures(target)
         if args.write_lock:
             lock[key] = {"sha256": digest, "license": license_name, "dir": directory}
             if ALLOWED_LICENSES[license_name]:

@@ -226,8 +226,8 @@ slider.onchange = () => fetch("/api/confidence", { method: "POST", headers: { "C
 
 document.getElementById("present").onclick = () => document.body.classList.toggle("present");
 const NARRATIVE = {
-  mission_feasible: ["Route is safe — heading to the victim", "forecast-checked outbound and return routes"],
-  target_route_unavailable: ["No safe way to the victim — moving to a refuge", "every route crosses the hazard limit"],
+  mission_feasible: ["Route is safe — heading to the next goal", "forecast-checked outbound and return routes"],
+  target_route_unavailable: ["No safe way to the goal — moving to a refuge", "every route crosses the hazard limit"],
   perception_confidence_degraded: ["Sensors degraded — moving to an observation point", "confidence below the continue threshold"],
   perception_confidence_critical: ["Sensors unreliable — taking refuge", "confidence below the critical threshold"],
   return_route_unavailable: ["Return path would be cut off — taking refuge", "forecast closes the way back"],
