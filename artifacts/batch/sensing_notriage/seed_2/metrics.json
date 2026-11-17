@@ -1,0 +1,31 @@
+{
+ "done": true,
+ "end_reason": "base",
+ "outcome": "complete",
+ "mission_s": 303.9,
+ "goals_total": 5,
+ "goals_reached": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "unreachable_now": [],
+ "metrics": {
+  "distance_m": 126.23,
+  "exposure_risk_s": 5.64,
+  "time_near_s": 2.0,
+  "time_in_s": 0.0,
+  "peak_risk": 0.6
+ },
+ "decisions": {
+  "continue_to_target": 665
+ },
+ "reason_codes": {
+  "mission_feasible": 665
+ },
+ "routes_sent": 7,
+ "routes_cancelled": 2,
+ "longest_still_s": 0.0
+}

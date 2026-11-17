@@ -118,6 +118,19 @@ def main() -> None:
         cyc = [c for r in runs for c in r["cycles"] if c > 0.02]
         if cyc:
             lines.append(f"| {MODE_LABEL[m]} | {len(cyc)} | {pct(cyc, 0.5):.2f} | {pct(cyc, 0.95):.2f} | {max(cyc):.2f} |")
+    bad_runs = [(m, r) for m, runs in modes.items() for r in runs if r["outcome"] != "complete"]
+    lines += ["", "## Runs that did not complete", ""]
+    if not bad_runs:
+        lines += ["None among the runs above."]
+    else:
+        lines += ["| Mode | Seed | Outcome | Points reached | Controller 'collision ahead' lines | 'Controller patience exceeded' | Last known position (m) |", "|---|---|---|---|---|---|---|"]
+        for m, r in bad_runs:
+            log = (root / m / f"seed_{r['seed']}" / "sim.log")
+            text = log.read_text(errors="ignore") if log.is_file() else ""
+            tl = (r.get("data") or {}).get("timeline") or []
+            pos = f"({tl[-1][4]}, {tl[-1][5]})" if tl else "—"
+            lines.append(f"| {m} | {r['seed']} | {r['outcome']} | {len((r.get('data') or {}).get('goals_reached', []))}/5 | "
+                         f"{text.count('collision ahead')} | {text.count('patience exceeded')} | {pos} |")
     lines += ["", "## Per-run results", "", "| Mode | Seed | Outcome | Points | Exposure | Hit risk ≥ 0.92 (s) | Mission (s) | Cancelled | Exit |", "|---|---|---|---|---|---|---|---|---|"]
     for m, runs in modes.items():
         for r in runs:

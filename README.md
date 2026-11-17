@@ -228,3 +228,9 @@ Genuine frames from the Gazebo GUI (Xvfb in the container, Intel GPU via Mesa, n
 ![Reroute, chase camera](docs/assets/screenshots/gazebo_rescue_reroute_chase.png)
 
 Not yet measured: frame rate on the laptop's display, and a 20-trial study in this world (the 20-trial study covers the corridor scenario in the kinematic runner).
+
+## Evidence: repeated full missions (2026-11-17)
+
+`tools/run_batch.sh` runs complete headless Gazebo/Nav2 missions in isolated containers with seeded random fires and measures exposure against the **real** hazard field. On 6 matched seeds, AegisNav with onboard sensing completed 6/6 missions and never entered a cell at risk ≥ 0.92 (0/6); a hazard-blind shortest-path baseline entered one in 6/6 runs, briefly, and completed 5/6. Mean exposure 6.7 ± 2.7 against 16.8 ± 6.2 risk·s (paired difference −10.1, 95% bootstrap CI −15.0 to −4.7).
+
+This is a small simulation study against a simple baseline, on a synthetic hazard model; it is not statistical proof and no percentage improvement is claimed. Full tables: `docs/simulation/batch_results.md`; interpretation, the one failure and the limits: `docs/simulation/batch_findings.md`; method: ADR-0009. Viva/hackathon answers: `docs/presentation/viva_qa.md`. Next steps: `docs/backlog/next_phase_roadmap.md`.

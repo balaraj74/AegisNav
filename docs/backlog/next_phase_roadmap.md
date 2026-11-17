@@ -5,7 +5,8 @@ Goal: make AegisNav measurably more credible, not just more impressive-looking. 
 ## What "perfect" means here
 "Perfect working" cannot be proven. What can be shown is a **measured reliability number**: N seeded full-mission runs in Gazebo, with success rate, failure causes and a confidence interval. Phase 1 produces it.
 
-## Phase 0 — Make the work safe and reproducible (1 day)
+## Phase 0 — Make the work safe and reproducible (1 day) — DONE 2026-11-17
+Committed locally in pieces and tagged `v0.2-sprint-2026-10`; console wording, fire-truck textures and ROS build/test CI done. Not pushed anywhere.
 - **First commit.** The repo has no commits yet; all sprint work exists only in the working tree. Commit in logical pieces (core, ROS, bringup/assets, docs), tag `v0.2-sprint-2026-10`.
 - **Fix known rough edges:**
   - console banner says "heading to the victim" for points without a victim;
@@ -13,7 +14,8 @@ Goal: make AegisNav measurably more credible, not just more impressive-looking. 
   - (checked) `SetColorRange is currently disabled` only logs a warning: the recorded flames render orange and the gas green.
 - **CI:** GitHub Actions running `run_core_tests.sh`, `verify_repo.sh`, and `colcon build/test` in the `aegisnav-jazzy` image.
 
-## Phase 1 — Prove reliability and the research claim (3–4 days)
+## Phase 1 — Prove reliability and the research claim (3–4 days) — PARTLY DONE 2026-11-17
+Done: batch runner, truth-based recorder, outcome taxonomy, statistics, 6 matched seeds sensing vs baseline (`docs/simulation/batch_findings.md`). Not done: 30+ runs, ablations beyond 2 seeds, stress cases, reactive baseline. Found: the courtyard goal sits next to rubble (controller failure); move it.
 1. **Headless batch runner:** `tools/run_batch.sh N` runs N compound missions with seeds, scripted fires randomized per seed, and records per-run outcome, time, exposure, planner cycle times and failure reason.
 2. **Report:** 30+ runs × {omniscient, sensing, distance-only baseline}; mean ± SD, success rate with a Wilson 95% interval, plus the failure taxonomy (stuck, stale pose, timeout, hazard entry).
 3. **Ablations** (each switch off in turn): sensing, triage, confidence hysteresis, exact-time accounting. Shows which feature earns its place.

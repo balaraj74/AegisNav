@@ -1,0 +1,140 @@
+{
+ "sensing": {
+  "runs": 6,
+  "outcomes": {
+   "complete": 6
+  },
+  "complete": 6,
+  "reached_base": 6,
+  "entered_hard_risk": 0,
+  "failed": 0,
+  "complete_ci": [
+   0.6096569663469354,
+   0.9999999999999999
+  ],
+  "entered_hard_risk_ci": [
+   0.0,
+   0.3903430336530645
+  ],
+  "exposure_by_seed": {
+   "1": 6.22,
+   "2": 3.17,
+   "3": 10.51,
+   "4": 4.42,
+   "5": 8.3,
+   "6": 7.79
+  },
+  "hard_time_by_seed": {
+   "1": 0.0,
+   "2": 0.0,
+   "3": 0.0,
+   "4": 0.0,
+   "5": 0.0,
+   "6": 0.0
+  }
+ },
+ "sensing_notriage": {
+  "runs": 2,
+  "outcomes": {
+   "complete": 2
+  },
+  "complete": 2,
+  "reached_base": 2,
+  "entered_hard_risk": 0,
+  "failed": 0,
+  "complete_ci": [
+   0.34237195288961925,
+   1.0
+  ],
+  "entered_hard_risk_ci": [
+   0.0,
+   0.6576280471103807
+  ],
+  "exposure_by_seed": {
+   "1": 5.63,
+   "2": 5.64
+  },
+  "hard_time_by_seed": {
+   "1": 0.0,
+   "2": 0.0
+  }
+ },
+ "omniscient": {
+  "runs": 2,
+  "outcomes": {
+   "complete": 2
+  },
+  "complete": 2,
+  "reached_base": 2,
+  "entered_hard_risk": 0,
+  "failed": 0,
+  "complete_ci": [
+   0.34237195288961925,
+   1.0
+  ],
+  "entered_hard_risk_ci": [
+   0.0,
+   0.6576280471103807
+  ],
+  "exposure_by_seed": {
+   "1": 5.08,
+   "2": 10.45
+  },
+  "hard_time_by_seed": {
+   "1": 0.0,
+   "2": 0.0
+  }
+ },
+ "baseline": {
+  "runs": 6,
+  "outcomes": {
+   "complete": 5,
+   "stuck": 1
+  },
+  "complete": 5,
+  "reached_base": 5,
+  "entered_hard_risk": 6,
+  "failed": 1,
+  "complete_ci": [
+   0.43649056343635395,
+   0.9699474141282697
+  ],
+  "entered_hard_risk_ci": [
+   0.6096569663469354,
+   0.9999999999999999
+  ],
+  "exposure_by_seed": {
+   "1": 24.77,
+   "2": 16.55,
+   "3": 15.59,
+   "4": 14.5,
+   "5": 7.1,
+   "6": 22.35
+  },
+  "hard_time_by_seed": {
+   "1": 2.0,
+   "2": 1.5,
+   "3": 2.0,
+   "4": 2.0,
+   "5": 1.5,
+   "6": 2.0
+  }
+ },
+ "paired_exposure": {
+  "sensing-baseline": {
+   "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "mean": -10.075000000000001,
+   "ci": [
+    -14.946666666666667,
+    -4.653333333333333
+   ]
+  }
+ }
+}
