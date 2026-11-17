@@ -1,0 +1,19 @@
+name: source-quality
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  source-only-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests, syntax and repository checks
+        run: ./tools/verify_repo.sh

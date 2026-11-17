@@ -1,0 +1,174 @@
+{
+  "scenario_family": "corridor_hazard_spread_v2 + seeded ignition/confidence events",
+  "seeds": [
+    7
+  ],
+  "metric_definitions": {
+    "hazard_exposure": "sum over 1 s ticks of ground-truth risk [0,1] at the robot's cell (risk-seconds)",
+    "time_near_hazard_s": "ticks with ground-truth risk >= near_risk (0.5)",
+    "time_in_hazard_s": "ticks with ground-truth risk >= hard_risk_threshold (0.92)",
+    "replans": "replacement goals dispatched after cancelling an active goal",
+    "path_length_m": "distance advanced by the simulated robot, metres",
+    "mission_time_s": "simulated seconds until a terminal outcome or timeout",
+    "planning_time_ms_mean": "wall-clock mean per decision cycle on the host; not deterministic",
+    "mission_completion_rate": "fraction of trials in which the robot reached the target cell",
+    "safe_return_rate": "fraction of trials that reached the target, returned to base, and never had ground-truth risk >= 0.92",
+    "safe_outcome_rate": "fraction of trials that ended at base or a refuge (not timeout/plan failure) with ground-truth risk never >= 0.92; includes early returns, so it does not measure mission success",
+    "abort_rate": "fraction of trials ending in ABORTED or PLAN_FAILED"
+  },
+  "model_notice": "Synthetic hazard and kinematic robot abstraction; no Gazebo/Nav2 involved. Not evidence of real-world safety.",
+  "summary": {
+    "aegisnav_risk_aware": {
+      "trials": 1,
+      "outcomes": {
+        "reached_refuge": 1
+      },
+      "mission_completion_rate": 0.0,
+      "safe_return_rate": 0.0,
+      "safe_outcome_rate": 1.0,
+      "abort_rate": 0.0,
+      "hazard_exposure": {
+        "mean": 1.1178,
+        "stdev": 0.0,
+        "min": 1.1178,
+        "max": 1.1178
+      },
+      "time_near_hazard_s": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "time_in_hazard_s": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "replans": {
+        "mean": 2.0,
+        "stdev": 0.0,
+        "min": 2.0,
+        "max": 2.0
+      },
+      "path_length_m": {
+        "mean": 13.4877,
+        "stdev": 0.0,
+        "min": 13.4877,
+        "max": 13.4877
+      },
+      "mission_time_s": {
+        "mean": 46.0,
+        "stdev": 0.0,
+        "min": 46.0,
+        "max": 46.0
+      },
+      "planning_time_ms_mean": {
+        "mean": 206.77,
+        "stdev": 0.0,
+        "min": 206.77,
+        "max": 206.77
+      },
+      "failed_seeds": [
+        7
+      ]
+    },
+    "distance_only_baseline": {
+      "trials": 1,
+      "outcomes": {
+        "completed_and_returned": 1
+      },
+      "mission_completion_rate": 1.0,
+      "safe_return_rate": 0.0,
+      "safe_outcome_rate": 0.0,
+      "abort_rate": 0.0,
+      "hazard_exposure": {
+        "mean": 15.9338,
+        "stdev": 0.0,
+        "min": 15.9338,
+        "max": 15.9338
+      },
+      "time_near_hazard_s": {
+        "mean": 11.0,
+        "stdev": 0.0,
+        "min": 11.0,
+        "max": 11.0
+      },
+      "time_in_hazard_s": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "replans": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "path_length_m": {
+        "mean": 19.3137,
+        "stdev": 0.0,
+        "min": 19.3137,
+        "max": 19.3137
+      },
+      "mission_time_s": {
+        "mean": 60.0,
+        "stdev": 0.0,
+        "min": 60.0,
+        "max": 60.0
+      },
+      "planning_time_ms_mean": {
+        "mean": 11.966,
+        "stdev": 0.0,
+        "min": 11.966,
+        "max": 11.966
+      },
+      "failed_seeds": []
+    }
+  },
+  "trials": {
+    "aegisnav_risk_aware": [
+      {
+        "seed": 7,
+        "mode": "aegisnav_risk_aware",
+        "outcome": "reached_refuge",
+        "reached_target": false,
+        "returned_to_base": false,
+        "safe_return": false,
+        "safe_outcome": true,
+        "hazard_exposure": 1.1178,
+        "time_near_hazard_s": 0,
+        "time_in_hazard_s": 0,
+        "max_risk_encountered": 0.2878,
+        "replans": 2,
+        "cancels": 2,
+        "path_length_m": 13.4877,
+        "mission_time_s": 46,
+        "planning_time_ms_mean": 206.77,
+        "planning_time_ms_max": 292.48
+      }
+    ],
+    "distance_only_baseline": [
+      {
+        "seed": 7,
+        "mode": "distance_only_baseline",
+        "outcome": "completed_and_returned",
+        "reached_target": true,
+        "returned_to_base": true,
+        "safe_return": false,
+        "safe_outcome": false,
+        "hazard_exposure": 15.9338,
+        "time_near_hazard_s": 11,
+        "time_in_hazard_s": 1,
+        "max_risk_encountered": 0.94,
+        "replans": 0,
+        "cancels": 0,
+        "path_length_m": 19.3137,
+        "mission_time_s": 60,
+        "planning_time_ms_mean": 11.966,
+        "planning_time_ms_max": 12.434
+      }
+    ]
+  }
+}

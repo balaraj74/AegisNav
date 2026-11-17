@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="340" font-family="sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="white"/>
+<text x="50" y="22" font-size="14" font-weight="bold">Baseline vs AegisNav — 1 seeded trials per mode (synthetic model)</text>
+<text x="50" y="46">Ground-truth hazard exposure (risk·s)</text>
+<line x1="50" y1="290" x2="350" y2="290" stroke="#444"/>
+<text x="44" y="64" text-anchor="end">15.9</text><text x="44" y="294" text-anchor="end">0</text>
+<rect x="95" y="273.9" width="70" height="16.1" fill="#2b6cb0" opacity="0.25"/>
+<circle cx="106" cy="273.9" r="3" fill="#2b6cb0"/>
+<text x="130" y="306" text-anchor="middle">aegisnav</text>
+<text x="130" y="320" text-anchor="middle" fill="#333">mean 1.12</text>
+<rect x="235" y="60.0" width="70" height="230.0" fill="#c05621" opacity="0.25"/>
+<circle cx="246" cy="60.0" r="3" fill="#c05621"/>
+<text x="270" y="306" text-anchor="middle">distance</text>
+<text x="270" y="320" text-anchor="middle" fill="#333">mean 15.93</text>
+<text x="410" y="46">Time at risk ≥ 0.92 (s)</text>
+<line x1="410" y1="290" x2="710" y2="290" stroke="#444"/>
+<text x="404" y="64" text-anchor="end">1.0</text><text x="404" y="294" text-anchor="end">0</text>
+<rect x="455" y="290.0" width="70" height="0.0" fill="#2b6cb0" opacity="0.25"/>
+<circle cx="466" cy="290.0" r="3" fill="#2b6cb0"/>
+<text x="490" y="306" text-anchor="middle">aegisnav</text>
+<text x="490" y="320" text-anchor="middle" fill="#333">mean 0.00</text>
+<rect x="595" y="60.0" width="70" height="230.0" fill="#c05621" opacity="0.25"/>
+<circle cx="606" cy="60.0" r="3" fill="#c05621"/>
+<text x="630" y="306" text-anchor="middle">distance</text>
+<text x="630" y="320" text-anchor="middle" fill="#333">mean 1.00</text>
+</svg>

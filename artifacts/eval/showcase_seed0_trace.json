@@ -1,0 +1,509 @@
+{
+  "aegisnav_risk_aware": {
+    "metrics": {
+      "seed": 0,
+      "mode": "aegisnav_risk_aware",
+      "outcome": "completed_and_returned",
+      "reached_target": true,
+      "returned_to_base": true,
+      "safe_return": true,
+      "safe_outcome": true,
+      "hazard_exposure": 4.4953,
+      "time_near_hazard_s": 2,
+      "time_in_hazard_s": 0,
+      "max_risk_encountered": 0.7091,
+      "replans": 0,
+      "cancels": 0,
+      "path_length_m": 20.4853,
+      "mission_time_s": 57,
+      "planning_time_ms_mean": 67.588,
+      "planning_time_ms_max": 120.399
+    },
+    "trace": [
+      {
+        "t": 0,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 21
+      },
+      {
+        "t": 0,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 21,
+        "goal": [
+          21,
+          13
+        ]
+      },
+      {
+        "t": 0,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 5,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 19
+      },
+      {
+        "t": 10,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 15
+      },
+      {
+        "t": 15,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 12
+      },
+      {
+        "t": 20,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 7
+      },
+      {
+        "t": 25,
+        "event": "hazard_ignition",
+        "sources": [
+          [
+            12,
+            11
+          ]
+        ]
+      },
+      {
+        "t": 25,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 2
+      },
+      {
+        "t": 26,
+        "event": "result",
+        "outcome": "succeeded"
+      },
+      {
+        "t": 27,
+        "event": "phase",
+        "phase": "return"
+      },
+      {
+        "t": 27,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 26
+      },
+      {
+        "t": 27,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 26,
+        "goal": [
+          2,
+          2
+        ]
+      },
+      {
+        "t": 27,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 30,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 25
+      },
+      {
+        "t": 35,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 20
+      },
+      {
+        "t": 40,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 15
+      },
+      {
+        "t": 45,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 11
+      },
+      {
+        "t": 50,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 8
+      },
+      {
+        "t": 55,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 3
+      },
+      {
+        "t": 56,
+        "event": "result",
+        "outcome": "succeeded"
+      },
+      {
+        "t": 57,
+        "event": "confidence_change",
+        "confidence": 0.471
+      }
+    ]
+  },
+  "aegisnav_onboard_sensing": {
+    "metrics": {
+      "seed": 0,
+      "mode": "aegisnav_onboard_sensing",
+      "outcome": "completed_and_returned",
+      "reached_target": true,
+      "returned_to_base": true,
+      "safe_return": true,
+      "safe_outcome": true,
+      "hazard_exposure": 4.5525,
+      "time_near_hazard_s": 2,
+      "time_in_hazard_s": 0,
+      "max_risk_encountered": 0.7091,
+      "replans": 0,
+      "cancels": 0,
+      "path_length_m": 20.4853,
+      "mission_time_s": 56,
+      "planning_time_ms_mean": 91.728,
+      "planning_time_ms_max": 283.137
+    },
+    "trace": [
+      {
+        "t": 0,
+        "event": "hazard_discovered",
+        "cells": [
+          [
+            11,
+            3
+          ]
+        ]
+      },
+      {
+        "t": 0,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 22
+      },
+      {
+        "t": 0,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 22,
+        "goal": [
+          21,
+          13
+        ]
+      },
+      {
+        "t": 0,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 5,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 19
+      },
+      {
+        "t": 10,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 16
+      },
+      {
+        "t": 15,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 12
+      },
+      {
+        "t": 20,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 8
+      },
+      {
+        "t": 25,
+        "event": "hazard_ignition",
+        "sources": [
+          [
+            12,
+            11
+          ]
+        ]
+      },
+      {
+        "t": 25,
+        "event": "hazard_discovered",
+        "cells": [
+          [
+            12,
+            11
+          ]
+        ]
+      },
+      {
+        "t": 25,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 3
+      },
+      {
+        "t": 26,
+        "event": "result",
+        "outcome": "succeeded"
+      },
+      {
+        "t": 27,
+        "event": "phase",
+        "phase": "return"
+      },
+      {
+        "t": 27,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 25
+      },
+      {
+        "t": 27,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 25,
+        "goal": [
+          2,
+          2
+        ]
+      },
+      {
+        "t": 27,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 30,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 24
+      },
+      {
+        "t": 35,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 19
+      },
+      {
+        "t": 40,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 16
+      },
+      {
+        "t": 45,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 11
+      },
+      {
+        "t": 50,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 7
+      },
+      {
+        "t": 55,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 2
+      },
+      {
+        "t": 55,
+        "event": "result",
+        "outcome": "succeeded"
+      }
+    ]
+  },
+  "distance_only_baseline": {
+    "metrics": {
+      "seed": 0,
+      "mode": "distance_only_baseline",
+      "outcome": "completed_and_returned",
+      "reached_target": true,
+      "returned_to_base": true,
+      "safe_return": false,
+      "safe_outcome": false,
+      "hazard_exposure": 11.9417,
+      "time_near_hazard_s": 8,
+      "time_in_hazard_s": 2,
+      "max_risk_encountered": 0.94,
+      "replans": 0,
+      "cancels": 0,
+      "path_length_m": 19.3137,
+      "mission_time_s": 54,
+      "planning_time_ms_mean": 6.932,
+      "planning_time_ms_max": 7.09
+    },
+    "trace": [
+      {
+        "t": 0,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "distance_only",
+        "route_waypoints": 21
+      },
+      {
+        "t": 0,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 21,
+        "goal": [
+          21,
+          13
+        ]
+      },
+      {
+        "t": 0,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 25,
+        "event": "hazard_ignition",
+        "sources": [
+          [
+            12,
+            11
+          ]
+        ]
+      },
+      {
+        "t": 26,
+        "event": "result",
+        "outcome": "succeeded"
+      },
+      {
+        "t": 27,
+        "event": "phase",
+        "phase": "return"
+      },
+      {
+        "t": 27,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "distance_only",
+        "route_waypoints": 21
+      },
+      {
+        "t": 27,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 21,
+        "goal": [
+          2,
+          2
+        ]
+      },
+      {
+        "t": 27,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 53,
+        "event": "result",
+        "outcome": "succeeded"
+      }
+    ]
+  }
+}

@@ -1,0 +1,330 @@
+{
+  "aegisnav_risk_aware": {
+    "metrics": {
+      "seed": 7,
+      "mode": "aegisnav_risk_aware",
+      "outcome": "reached_refuge",
+      "reached_target": false,
+      "returned_to_base": false,
+      "safe_return": false,
+      "safe_outcome": true,
+      "hazard_exposure": 1.1178,
+      "time_near_hazard_s": 0,
+      "time_in_hazard_s": 0,
+      "max_risk_encountered": 0.2878,
+      "replans": 2,
+      "cancels": 2,
+      "path_length_m": 13.4877,
+      "mission_time_s": 46,
+      "planning_time_ms_mean": 207.806,
+      "planning_time_ms_max": 323.5
+    },
+    "trace": [
+      {
+        "t": 0,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 21
+      },
+      {
+        "t": 0,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 21,
+        "goal": [
+          21,
+          13
+        ]
+      },
+      {
+        "t": 0,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 5,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 19
+      },
+      {
+        "t": 10,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 16
+      },
+      {
+        "t": 15,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 13
+      },
+      {
+        "t": 16,
+        "event": "hazard_ignition",
+        "sources": [
+          [
+            10,
+            12
+          ]
+        ]
+      },
+      {
+        "t": 16,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 12
+      },
+      {
+        "t": 16,
+        "event": "cancel",
+        "reason_code": "replan_cancel"
+      },
+      {
+        "t": 16,
+        "event": "result",
+        "outcome": "canceled"
+      },
+      {
+        "t": 16,
+        "event": "send",
+        "reason_code": "replacement_dispatch",
+        "waypoints": 12,
+        "goal": [
+          21,
+          13
+        ]
+      },
+      {
+        "t": 17,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 20,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 11
+      },
+      {
+        "t": 25,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "mission_feasible",
+        "confidence": 0.95,
+        "explanation": "The target route and forecast-time return route satisfy configured exposure, confidence and forecast-horizon constraints.",
+        "route_waypoints": 7
+      },
+      {
+        "t": 28,
+        "event": "confidence_change",
+        "confidence": 0.338
+      },
+      {
+        "t": 28,
+        "event": "decision",
+        "action": "slow_and_reassess",
+        "reason_code": "perception_confidence_degraded",
+        "confidence": 0.338,
+        "explanation": "Perception confidence is degraded; reassess from a reachable low-risk observation point before continuing.",
+        "route_waypoints": 12
+      },
+      {
+        "t": 28,
+        "event": "cancel",
+        "reason_code": "replan_cancel"
+      },
+      {
+        "t": 28,
+        "event": "result",
+        "outcome": "canceled"
+      },
+      {
+        "t": 28,
+        "event": "send",
+        "reason_code": "replacement_dispatch",
+        "waypoints": 12,
+        "goal": [
+          21,
+          2
+        ]
+      },
+      {
+        "t": 29,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 30,
+        "event": "decision",
+        "action": "slow_and_reassess",
+        "reason_code": "perception_confidence_degraded",
+        "confidence": 0.338,
+        "explanation": "Perception confidence is degraded; reassess from a reachable low-risk observation point before continuing.",
+        "route_waypoints": 12
+      },
+      {
+        "t": 35,
+        "event": "decision",
+        "action": "slow_and_reassess",
+        "reason_code": "perception_confidence_degraded",
+        "confidence": 0.338,
+        "explanation": "Perception confidence is degraded; reassess from a reachable low-risk observation point before continuing.",
+        "route_waypoints": 10
+      },
+      {
+        "t": 40,
+        "event": "decision",
+        "action": "slow_and_reassess",
+        "reason_code": "perception_confidence_degraded",
+        "confidence": 0.338,
+        "explanation": "Perception confidence is degraded; reassess from a reachable low-risk observation point before continuing.",
+        "route_waypoints": 6
+      },
+      {
+        "t": 45,
+        "event": "decision",
+        "action": "slow_and_reassess",
+        "reason_code": "perception_confidence_degraded",
+        "confidence": 0.338,
+        "explanation": "Perception confidence is degraded; reassess from a reachable low-risk observation point before continuing.",
+        "route_waypoints": 2
+      },
+      {
+        "t": 45,
+        "event": "result",
+        "outcome": "succeeded"
+      },
+      {
+        "t": 46,
+        "event": "decision",
+        "action": "slow_and_reassess",
+        "reason_code": "perception_confidence_degraded",
+        "confidence": 0.338,
+        "explanation": "Perception confidence is degraded; reassess from a reachable low-risk observation point before continuing.",
+        "route_waypoints": 1
+      },
+      {
+        "t": 46,
+        "event": "terminal",
+        "outcome": "reached_refuge",
+        "reason_code": "perception_confidence_degraded"
+      }
+    ]
+  },
+  "distance_only_baseline": {
+    "metrics": {
+      "seed": 7,
+      "mode": "distance_only_baseline",
+      "outcome": "completed_and_returned",
+      "reached_target": true,
+      "returned_to_base": true,
+      "safe_return": false,
+      "safe_outcome": false,
+      "hazard_exposure": 15.9338,
+      "time_near_hazard_s": 11,
+      "time_in_hazard_s": 1,
+      "max_risk_encountered": 0.94,
+      "replans": 0,
+      "cancels": 0,
+      "path_length_m": 19.3137,
+      "mission_time_s": 60,
+      "planning_time_ms_mean": 11.892,
+      "planning_time_ms_max": 12.348
+    },
+    "trace": [
+      {
+        "t": 0,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "distance_only",
+        "route_waypoints": 21
+      },
+      {
+        "t": 0,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 21,
+        "goal": [
+          21,
+          13
+        ]
+      },
+      {
+        "t": 0,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 16,
+        "event": "hazard_ignition",
+        "sources": [
+          [
+            10,
+            12
+          ]
+        ]
+      },
+      {
+        "t": 28,
+        "event": "confidence_change",
+        "confidence": 0.338
+      },
+      {
+        "t": 29,
+        "event": "result",
+        "outcome": "succeeded"
+      },
+      {
+        "t": 30,
+        "event": "phase",
+        "phase": "return"
+      },
+      {
+        "t": 30,
+        "event": "decision",
+        "action": "continue_to_target",
+        "reason_code": "distance_only",
+        "route_waypoints": 21
+      },
+      {
+        "t": 30,
+        "event": "send",
+        "reason_code": "dispatch",
+        "waypoints": 21,
+        "goal": [
+          2,
+          2
+        ]
+      },
+      {
+        "t": 30,
+        "event": "goal_response",
+        "accepted": true
+      },
+      {
+        "t": 59,
+        "event": "result",
+        "outcome": "succeeded"
+      }
+    ]
+  }
+}
