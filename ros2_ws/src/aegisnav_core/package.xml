@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>aegisnav_core</name>
+  <version>0.1.0</version>
+  <description>ROS-independent predictive hazard forecasting, time-indexed route planning, mission safety policy and evaluation.</description>
+  <maintainer email="maintainer@example.invalid">AegisNav Maintainers</maintainer>
+  <license>Apache-2.0</license>
+  <test_depend>python3-pytest</test_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
