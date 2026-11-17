@@ -1,0 +1,78 @@
+{
+  "Cinder Block@3": {
+    "dir": "cinder_block",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "f145345cc7edeadde97d27e2a38cba5722a51f0efe0876a077cb349aefcce557"
+  },
+  "Clearpath Robotics Husky A200@3": {
+    "dir": "husky",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "9069a277542949606bd7429e284094286a24ec6aacc4f7698a2aed19c902b383"
+  },
+  "Collapsed Fire Station@3": {
+    "dir": "collapsed_fire_station",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "ddaa3e34081edc12aa64289ee0e31b8469b3067d8f0b282f9b18e9c7524095e0"
+  },
+  "Collapsed House@4": {
+    "dir": "collapsed_house",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "d9fa35138a389e6fbd84be3a293320a0acf9b17f9f1a9e0b2f7a2a28acac9c42"
+  },
+  "Collapsed industrial building@3": {
+    "dir": "collapsed_industrial",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "896ff65311fc67b4f79142223c36ad51b92bb645be4f20cbc71705a1c8a04f81"
+  },
+  "Collapsed police station@3": {
+    "dir": "collapsed_police_station",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "c6337db2c204a7c4b81e531f57f1add6d860184467f50463e27216379f725ece"
+  },
+  "Construction Barrel@4": {
+    "dir": "construction_barrel",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "3df9417f2478864946eabd064e0ad7d9cd6178eaa96a060886eb560372f36fc9"
+  },
+  "Construction Cone@3": {
+    "dir": "construction_cone",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "a6962fb5f787ba0ee21d0a9f1e96d95dde5160146852abcc45df35b33a46a34e"
+  },
+  "Euro pallet@3": {
+    "dir": "euro_pallet",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "7bff0e331c633b11342032d1dcb5a5d14cae9f9d209a3a4a2c4fd7779a2017c7"
+  },
+  "Fire Extinguisher@5": {
+    "dir": "fire_extinguisher",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "6391147af9bb4b715a2639cdef828439846b6f6fa43c6d8e1d406237aa63ba68"
+  },
+  "Fire hydrant@3": {
+    "dir": "fire_hydrant",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "195f61a67e506aca7ca7ec5fd61d45e4aec140da4e86be2bf8a0ac94b7d6ac2d"
+  },
+  "Fire truck@3": {
+    "dir": "fire_truck",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "c4947b41b0f013758ba3d6056f3c1c02bf0d572615e26059a41f409e2a7ca710"
+  },
+  "Fog Emitter@5": {
+    "attribution": "\"Fog Emitter\" v5 by Carlos Aguero (OpenRobotics), https://app.gazebosim.org/OpenRobotics/fuel/models/Fog%20Emitter/5, licensed Creative Commons Attribution 4.0 International (http://creativecommons.org/licenses/by/4.0/)",
+    "dir": "fog_emitter",
+    "license": "Creative Commons Attribution 4.0 International",
+    "sha256": "70cec7732161fce93815059780c6099d48c46c923f6a9cb7de6bd593dbfa45e4"
+  },
+  "Jersey Barrier@6": {
+    "dir": "jersey_barrier",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "8b813dbb19a9c5c24f426d03e389f83d9c37fa5eaf0380e3539929275b8fb0ea"
+  },
+  "Rescue Randy Sitting@8": {
+    "dir": "rescue_randy_sitting",
+    "license": "Creative Commons Zero v1.0 Universal",
+    "sha256": "611ef9ddadfba16be25963f2b79967fec6493c638ca77d0652f18fbbc5202fb3"
+  }
+}

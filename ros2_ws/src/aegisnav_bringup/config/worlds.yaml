@@ -1,0 +1,45 @@
+# World presets selected by `sim_world.launch.py world:=<name>`. Every file named here is generated
+# from aegisnav_core.scenarios by tools/generate_world_assets.py; tests check the presets against the scenarios.
+corridor:
+  scenario_name: corridor
+  world_sdf: worlds/aegisnav_rescue.sdf
+  planning_map: maps/aegisnav_rescue.yaml
+  localization_map: maps/aegisnav_rescue_fine.yaml
+  nav2_params: config/nav2_params.yaml
+  spawn_xy: [-3.8, -2.2]          # metres, map frame (= robot pose in the SDF)
+  lidar_xyz: [0.07, 0.0, 0.16]    # base_link -> lidar, metres
+  nominal_speed_mps: 0.35         # = RPP desired_linear_vel in nav2_params
+  start_snap_tolerance_m: 0.25
+  wall_clearance_cells: 1
+  wall_clearance_penalty_m: 0.3
+  straight_near_obstacles: false
+  inflate_obstacles_cells: 0
+rescue_building:
+  scenario_name: rescue_building
+  world_sdf: worlds/rescue_building.sdf
+  planning_map: maps/rescue_building.yaml
+  localization_map: maps/rescue_building_fine.yaml
+  nav2_params: config/nav2_params_husky.yaml
+  spawn_xy: [-8.25, -5.25]
+  lidar_xyz: [0.2, 0.0, 0.40]
+  nominal_speed_mps: 0.6
+  start_snap_tolerance_m: 0.3
+  wall_clearance_cells: 2         # ~1 m robot on 0.5 m cells
+  wall_clearance_penalty_m: 1.0   # strong enough to centre the route in 2 m doorways
+  straight_near_obstacles: true   # long robot: no turning inside doorways
+  inflate_obstacles_cells: 1      # hard margin: robot centre never in a wall-touching cell
+rescue_compound:                  # the building plus courtyard, yard and warehouse (36 x 22 m), 5 inspection points
+  scenario_name: rescue_compound
+  world_sdf: worlds/rescue_compound.sdf
+  planning_map: maps/rescue_compound.yaml
+  localization_map: maps/rescue_compound_fine.yaml
+  nav2_params: config/nav2_params_husky.yaml
+  spawn_xy: [-8.25, -5.25]
+  lidar_xyz: [0.2, 0.0, 0.40]
+  nominal_speed_mps: 0.6
+  start_snap_tolerance_m: 0.3
+  wall_clearance_cells: 2
+  wall_clearance_penalty_m: 1.0
+  straight_near_obstacles: true
+  inflate_obstacles_cells: 1
+  triage: true                    # next inspection point = lowest-exposure safe route (scenario node)

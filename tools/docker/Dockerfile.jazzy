@@ -1,0 +1,10 @@
+# Reproducible Ubuntu 24.04 / ROS 2 Jazzy / Gazebo Harmonic test environment.
+# Packages come from the official ROS apt repository inside the ros:jazzy base image.
+FROM ros:jazzy
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ros-jazzy-ros-gz ros-jazzy-navigation2 ros-jazzy-nav2-bringup \
+      ros-jazzy-rviz2 ros-jazzy-tf2-ros-py ros-jazzy-nav2-dwb-controller \
+      python3-colcon-common-extensions python3-pytest xvfb mesa-utils libgl1-mesa-dri imagemagick \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

@@ -1,0 +1,49 @@
+# Human-readable mirror of the ROS parameter configuration.
+# Update both this file and ros2_ws/src/aegisnav_ros/config/aegisnav.yaml when
+# changing runtime parameters; verify parameter names against the node source.
+platform:
+  ubuntu: "24.04"
+  ros_distro: jazzy
+  gazebo: harmonic
+
+forecast:
+  forecast_steps: 120
+  time_step_s: 1.0
+  spread_rate: 0.24
+  decay_rate: 0.008
+  uncertainty_growth: 0.018
+  # Cell indices for the bundled 24x16 planning grid (not meters); map v2.
+  source_cells_xy: [11, 3, 9, 4]
+  source_intensities: [0.94, 0.42]
+
+planner:
+  hazard_weight: 12.0
+  uncertainty_weight: 2.5
+  hard_risk_threshold: 0.92
+  nominal_speed_mps: 0.35          # must equal RPP desired_linear_vel (asset test)
+  diagonal_motion: true
+  wall_clearance_penalty_m: 0.3    # static traversability preference, not hazard
+
+mission:
+  base_cell_xy: [2, 2]
+  refuge_cells_xy: [2, 12, 21, 2, 6, 12]
+  minimum_continue_confidence: 0.55
+  critical_confidence: 0.30
+  max_outbound_exposure: 18.0
+  max_return_exposure: 18.0
+
+maps:
+  planning_map_topic: /aegisnav/planning_map   # 0.4 m grid for planner + forecaster
+  localization_map_topic: /map                 # 0.05 m, same geometry, AMCL/costmap/RViz
+
+pose:
+  pose_source: tf                  # map->base_footprint; freshness from odom->base_footprint
+  max_input_age_s: 3.0
+  start_snap_tolerance_m: 0.25
+
+execution:
+  execute_with_follow_path: false  # node default; sim_world.launch.py passes execute:=true
+  replan_min_improvement: 0.15     # keep active route unless candidate >= 15% cheaper
+  path_spacing_m: 0.1
+  controller: nav2_regulated_pure_pursuit_controller (FollowPath)
+  rationale: "Verified end to end in headless Gazebo (seeds 3, 7); see docs/testing/verification_matrix.md."
