@@ -29,7 +29,7 @@ from aegisnav_core.execution import (
     CommandKind, ExecCommand, ExecState, ExecutionController, GoalOutcome, keep_active_route, remaining_route, stale_inputs,
 )
 from aegisnav_core.mission import ConfidenceHysteresis, MissionPolicy, MissionSafetySupervisor
-from aegisnav_core.models import Cell, PlannerConfig, RoutePlan
+from aegisnav_core.models import Cell, MissionAction, MissionAssessment, PlannerConfig, RoutePlan
 from aegisnav_core.path_geometry import centred_waypoints, densify
 from aegisnav_core.planning import RiskAwareAStar, evaluate_route
 from aegisnav_core.scenarios import scenario_by_name
@@ -93,6 +93,9 @@ class RiskPlannerNode(Node):
         # Seconds; pose and forecast older than this make the cycle fail closed.
         self.declare_parameter("slow_cycle_warn_s", 1.0)  # log cycles slower than this (0 = log every cycle)
         self.declare_parameter("max_input_age_s", 3.0)
+        # Evaluation baseline: plan the shortest path to the current goal, ignoring hazard and uncertainty
+        # (hard threshold 0.99, as in the closed-loop study). No mission policy: it never holds, returns or aborts.
+        self.declare_parameter("baseline_distance_only", False)
 
         name = str(self.get_parameter("scenario_name").value)
         if name:
@@ -156,6 +159,15 @@ class RiskPlannerNode(Node):
             inflate_obstacles_cells=int(self.get_parameter("inflate_obstacles_cells").value),
         )
         self._planner_config = planner_cfg
+        self._baseline = bool(self.get_parameter("baseline_distance_only").value)
+        if self._baseline:
+            planner_cfg = PlannerConfig(
+                hazard_weight=0.0, uncertainty_weight=0.0, hard_risk_threshold=0.99,
+                nominal_speed_mps=planner_cfg.nominal_speed_mps, wall_clearance_penalty_m=planner_cfg.wall_clearance_penalty_m,
+                wall_clearance_cells=planner_cfg.wall_clearance_cells,
+                straight_near_obstacles=planner_cfg.straight_near_obstacles,
+                inflate_obstacles_cells=planner_cfg.inflate_obstacles_cells)
+        self._eval_config = planner_cfg  # scores the active route: the baseline must not judge it by risk
         policy = MissionPolicy(
             minimum_continue_confidence=float(self.get_parameter("minimum_continue_confidence").value),
             critical_confidence=float(self.get_parameter("critical_confidence").value),
@@ -166,6 +178,16 @@ class RiskPlannerNode(Node):
         self._confidence_latch = ConfidenceHysteresis(
             policy.minimum_continue_confidence, float(self.get_parameter("resume_confidence").value))
         return MissionSafetySupervisor(self._planner, policy)
+
+    def _baseline_assessment(self, grid, frames, current, target, confidence, time_step_s) -> MissionAssessment:
+        plan = self._planner.plan(grid, frames, current, target, self._eval_config, time_step_s=time_step_s)
+        if plan.success:
+            return MissionAssessment(
+                MissionAction.CONTINUE_TO_TARGET, "distance_only_baseline",
+                "Evaluation baseline: shortest path to the goal, ignoring hazard and uncertainty.",
+                outbound=plan, confidence=confidence)
+        return MissionAssessment(MissionAction.ABORT, plan.reason, "Evaluation baseline: no path to the goal.",
+                                 confidence=confidence)
 
     def _on_map(self, msg: OccupancyGrid) -> None:
         try:
@@ -328,15 +350,18 @@ class RiskPlannerNode(Node):
             refuges = self._refuges()
             frames = risk_frames_from_message(forecast_msg, grid, map_frame)
             time_step_s = max(0.01, float(forecast_msg.time_step_s))
-            assessment = self._supervisor.assess(
-                grid, frames, current, target, base, refuges, self._confidence_latch.update(confidence),
-                time_step_s=time_step_s,
-            )
+            if self._baseline:
+                assessment = self._baseline_assessment(grid, frames, current, target, confidence, time_step_s)
+            else:
+                assessment = self._supervisor.assess(
+                    grid, frames, current, target, base, refuges, self._confidence_latch.update(confidence),
+                    time_step_s=time_step_s,
+                )
             selected_plan = assessment.execution_route
             if selected_plan is not None and self._exec.state is ExecState.EXECUTING:
                 ahead = remaining_route(self._exec.active_cells, current)
                 if ahead is not None:
-                    active_eval = evaluate_route(grid, frames, ahead, self._planner_config, time_step_s=time_step_s)
+                    active_eval = evaluate_route(grid, frames, ahead, self._eval_config, time_step_s=time_step_s)
                     if keep_active_route(active_eval, selected_plan, min_relative_improvement=self._min_improvement):
                         selected_plan = active_eval  # remaining active route: no cancel/resend
             path_msg = self._path_message(map_msg.header.frame_id or "map", selected_plan, grid)

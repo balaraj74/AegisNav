@@ -27,3 +27,4 @@ artifacts/demo/
 *.swp
 *.swo
 artifacts/video/
+artifacts/batch/**/build.log

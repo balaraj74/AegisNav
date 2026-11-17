@@ -30,5 +30,6 @@ setup(
         "aegisnav-console = aegisnav_ros.console_node:main",
         "aegisnav-director = aegisnav_ros.director_node:main",
         "aegisnav-hazard-sensor = aegisnav_ros.hazard_sensor_node:main",
+        "aegisnav-mission-recorder = aegisnav_ros.mission_recorder_node:main",
     ]},
 )

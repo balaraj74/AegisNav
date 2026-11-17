@@ -191,9 +191,12 @@ class ConsoleNode(Node):
         x, y = tf.transform.translation.x, tf.transform.translation.y
         with self._lock:
             self._robot = {"x": round(x, 3), "y": round(y, 3), "yaw": round(yaw, 3)}
-            if self._grid is not None and len(self._risk_now) == self._grid.size:
+            # What the robot experienced is measured against the real field: the hidden truth when sensing is
+            # on (the forecast layer is then only the robot's belief), else the forecast's current layer.
+            field = self._risk_truth if self._risk_truth else self._risk_now
+            if self._grid is not None and len(field) == self._grid.size:
                 cell = world_to_cell(self._grid, x, y)
-                risk = self._risk_now[self._grid.index(cell)] / 100.0 if cell is not None else 0.0
+                risk = field[self._grid.index(cell)] / 100.0 if cell is not None else 0.0
                 self._metrics.update(self._now(), x, y, max(0.0, min(1.0, risk)))
 
     # --- HTTP --------------------------------------------------------------------------

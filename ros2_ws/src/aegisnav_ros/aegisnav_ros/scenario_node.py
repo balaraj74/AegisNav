@@ -32,6 +32,7 @@ from std_msgs.msg import Float32, String
 from aegisnav_core.models import Cell, PlannerConfig
 from aegisnav_msgs.msg import HazardForecast
 
+from aegisnav_core.batch import randomized_ignitions
 from aegisnav_core.scenarios import scenario_by_name
 from aegisnav_core.simulation import seeded_dynamic_scenario
 from aegisnav_core.timeline import ScenarioTimeline, ScriptTimeline, next_goal, triage_next_goal
@@ -67,8 +68,14 @@ class ScenarioNode(Node):
                         f"{dynamic.confidence_drop_time_s}s to {dynamic.confidence_after}")
         else:
             self._scn = scenario_by_name(name)
-            self._timeline = ScriptTimeline(self._scn.scripted_ignitions, self._scn.scripted_confidence)
-            schedule = (f"ignitions {[(t, (c.x, c.y)) for t, c, _ in self._scn.scripted_ignitions]}, "
+            ignitions = self._scn.scripted_ignitions
+            self.declare_parameter("ignition_seed", -1)  # >= 0: batch study, seeded random ignitions
+            self.declare_parameter("ignition_count", 3)
+            ignition_seed = int(self.get_parameter("ignition_seed").value)
+            if ignition_seed >= 0:
+                ignitions = randomized_ignitions(self._scn, ignition_seed, count=int(self.get_parameter("ignition_count").value))
+            self._timeline = ScriptTimeline(ignitions, self._scn.scripted_confidence)
+            schedule = (f"ignitions {[(t, (c.x, c.y)) for t, c, _ in ignitions]}, "
                         f"confidence {list(self._scn.scripted_confidence)}")
         self._goals = self._scn.mission_goals
         self._frame = str(self.get_parameter("map_frame").value)

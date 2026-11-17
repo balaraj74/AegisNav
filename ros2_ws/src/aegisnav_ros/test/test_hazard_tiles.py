@@ -90,6 +90,17 @@ class HazardTileTests(unittest.TestCase):
             for spec in emitters:
                 self.assertTrue((models / "aegisnav_effects/materials/textures" / spec[-1]).is_file(), spec[-1])
 
+    def test_fire_has_a_warm_glow_light_and_gas_does_not(self):
+        from aegisnav_ros.hazard_tiles import effect_model_sdf
+        fire = ET.fromstring(effect_model_sdf("fx_fire_0", "fire", models_dir="/m")).find("model")
+        lights = list(fire.iter("light"))
+        self.assertEqual(len(lights), 1)
+        r, g, b, _a = (float(v) for v in lights[0].find("diffuse").text.split())
+        self.assertTrue(r > g > b)  # warm
+        self.assertEqual(lights[0].find("cast_shadows").text, "false")
+        gas = ET.fromstring(effect_model_sdf("fx_gas_0", "gas", models_dir="/m")).find("model")
+        self.assertEqual(list(gas.iter("light")), [])
+
     def test_invalid_arguments(self):
         with self.assertRaises(ValueError):
             band_model_sdf("x", 0, [], 0.36)

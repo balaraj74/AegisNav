@@ -104,6 +104,16 @@ _GEOMETRY_PARTS = {
 }
 
 
+# Warm point light per fire so flames light the walls and floor around them (display only; lidar ignores lights).
+# Steady, not flickering: a static model cannot animate a light. (kind -> sdf <light> element or "")
+_GLOW_LIGHT = {
+    "fire": ('<light name="glow" type="point"><pose>0 0 1.1 0 0 0</pose><cast_shadows>false</cast_shadows>'
+             "<diffuse>1 0.48 0.14 1</diffuse><specular>0.25 0.1 0.03 1</specular><intensity>2.2</intensity>"
+             "<attenuation><range>8</range><constant>0.25</constant><linear>0.22</linear><quadratic>0.1</quadratic></attenuation></light>"),
+    "gas": "",
+}
+
+
 def _bringup_models_dir() -> str:
     from ament_index_python.packages import get_package_share_directory
     return f"{get_package_share_directory('aegisnav_bringup')}/models"
@@ -140,6 +150,6 @@ def effect_model_sdf(name: str, kind: str, *, models_dir: str | None = None) -> 
             f"<visibility_flags>{HAZARD_VISIBILITY_FLAGS}</visibility_flags><transparency>{transparency}</transparency>"
             f"<geometry><{shape}><radius>{radius}</radius><length>{length}</length></{shape}></geometry>"
             f"<material><ambient>{rgb} 1</ambient><diffuse>{rgb} 1</diffuse><emissive>{glow} 1</emissive></material></visual>")
-    body = "".join(visuals) + "".join(_emitter_sdf(e, models_dir) for e in emitters)
+    body = "".join(visuals) + "".join(_emitter_sdf(e, models_dir) for e in emitters) + _GLOW_LIGHT[kind]
     return (f'<?xml version="1.0"?><sdf version="1.9"><model name="{name}"><static>true</static>'
             f'<link name="l">{body}</link></model></sdf>')
