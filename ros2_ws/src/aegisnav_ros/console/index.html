@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AegisNav Mission Console</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #151b23; --panel2: #1b2330; --line: #263040; --text: #e6edf3; --muted: #8b98a8;
+    --cyan: #2fd3ff; --amber: #ffb020; --red: #ff4d3d; --green: #36d399; --blue: #4c8dff; --violet: #b07cff; --pink: #ff5fa2;
+    --ok: #36d399; --warn: #ffb020; --bad: #ff4d3d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.4 "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 18px; border-bottom: 1px solid var(--line); background: #0b0f14; }
+  .brand { font-weight: 700; letter-spacing: .08em; }
+  .brand span { color: var(--cyan); }
+  .chip { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--panel2); color: var(--muted); }
+  .chip.live { color: #0b0f14; background: var(--green); }
+  .grow { flex: 1; }
+  .clock { font-variant-numeric: tabular-nums; color: var(--muted); }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 14px; padding: 14px; height: calc(100% - 52px); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .mapwrap { position: relative; display: flex; flex-direction: column; min-height: 0; }
+  canvas { width: 100%; flex: 1; min-height: 0; border-radius: 8px; background: #0a0e13; cursor: crosshair; }
+  .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { background: transparent; color: var(--muted); border: 0; padding: 6px 12px; cursor: pointer; font: inherit; }
+  .seg button.on { background: var(--panel2); color: var(--text); }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 12px; margin-left: auto; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  aside { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow: auto; }
+  h3 { margin: 0 0 8px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .action { font-size: 24px; font-weight: 800; letter-spacing: .02em; }
+  .reason { color: var(--muted); font-family: ui-monospace, Menlo, monospace; font-size: 12px; margin: 2px 0 8px; }
+  .explain { color: #c9d4df; }
+  .a-continue { color: var(--green); } .a-refuge, .a-slow { color: var(--amber); } .a-return { color: var(--blue); } .a-abort { color: var(--red); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; padding: 3px 0; }
+  .row b { font-variant-numeric: tabular-nums; }
+  .gauge { height: 8px; border-radius: 4px; background: var(--panel2); overflow: hidden; margin: 6px 0 4px; }
+  .gauge > div { height: 100%; transition: width .3s; }
+  input[type=range] { width: 100%; accent-color: var(--cyan); }
+  .cmp { display: grid; grid-template-columns: 110px 1fr 64px; gap: 6px 8px; align-items: center; font-size: 13px; }
+  .bar { height: 10px; border-radius: 5px; background: var(--panel2); overflow: hidden; }
+  .bar > div { height: 100%; }
+  .flag { font-size: 11px; color: var(--red); font-weight: 700; }
+  .events { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #c9d4df; }
+  .events div { padding: 3px 0; border-bottom: 1px dashed #222b38; }
+  .steps { display: flex; gap: 6px; }
+  .step { flex: 1; text-align: center; padding: 6px 4px; border-radius: 6px; background: var(--panel2); color: var(--muted); font-size: 12px; font-weight: 600; }
+  .step.done { background: rgba(54, 211, 153, .15); color: var(--green); }
+  .step.now { outline: 1px solid var(--cyan); color: var(--text); }
+  .note { color: var(--muted); font-size: 11px; }
+  .caption { margin: 0 0 10px; background: #0b0f14; border: 1px solid var(--line); border-left: 4px solid var(--cyan);
+    padding: 8px 14px; border-radius: 8px; font-size: 18px; font-weight: 700; transition: border-color .3s; }
+  .caption small { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+  body.present aside .panel:nth-child(n+4), body.present .toolbar .seg, body.present .hint { display: none; }
+  body.present .caption { font-size: 26px; }
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    .mapwrap { min-height: 70vh; }
+    header .note { display: none; }
+  }
+  .hint { position: absolute; left: 22px; bottom: 18px; background: rgba(13,17,23,.85); padding: 6px 10px; border-radius: 6px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">AEGIS<span>NAV</span></div>
+  <div class="chip" id="scenario">—</div>
+  <div class="chip" id="conn">connecting</div>
+  <div class="grow"></div>
+  <div class="note">Simulation research prototype · hazard and confidence are simulated inputs</div>
+  <button id="present" style="background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer">Presentation</button>
+  <div class="clock" id="clock">t = 0.0 s</div>
+</header>
+<main>
+  <section class="panel mapwrap">
+    <div class="toolbar">
+      <div class="seg" id="clickmode"><button data-m="fire" class="on">Click: start fire</button><button data-m="goal">Click: set goal</button></div>
+      <div class="seg" id="layer"><button data-l="now" class="on">Hazard now</button><button data-l="pred">Predicted</button><button data-l="truth" id="truthbtn" style="display:none" title="The real hazard field, hidden from the robot (sensing mode)">Truth</button></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--cyan)"></i>AegisNav route</span>
+        <span><i class="sw" style="background:var(--red)"></i>Shortest path (ignores hazard)</span>
+        <span><i class="sw" style="background:#8b98a8"></i>Cancelled route</span>
+        <span><i class="sw" style="background:var(--pink)"></i>Victim</span>
+        <span><i class="sw" style="background:var(--green)"></i>Refuge</span>
+        <span><i class="sw" style="background:var(--blue)"></i>Base</span>
+      </div>
+    </div>
+    <div class="caption" id="caption">Connecting…</div>
+    <canvas id="map"></canvas>
+    <div class="hint" id="hint">Click the map to start a simulated fire</div>
+  </section>
+  <aside>
+    <div class="panel">
+      <h3>Decision</h3>
+      <div class="action" id="action">—</div>
+      <div class="reason" id="reason"></div>
+      <div class="explain" id="explain">Waiting for the planner…</div>
+    </div>
+    <div class="panel">
+      <h3>Mission</h3>
+      <div class="steps" id="steps"></div>
+      <div class="row" style="margin-top:8px"><span>Phase</span><b id="phase">—</b></div>
+    </div>
+    <div class="panel">
+      <h3>Route risk on the current forecast</h3>
+      <div class="cmp" id="cmp"></div>
+      <div class="note" style="margin-top:6px">Both routes scored with the same forecast and motion model each cycle. Peak risk ≥ 0.92 crosses the configured hard limit.</div>
+    </div>
+    <div class="panel">
+      <h3>Perception confidence (simulated)</h3>
+      <div class="row"><span>Current</span><b id="confv">—</b></div>
+      <div class="gauge"><div id="confbar"></div></div>
+      <input type="range" min="0" max="1" step="0.01" value="0.95" id="confslider">
+      <div class="row"><span class="note">Drag and release to send</span><b id="confset">0.95</b></div>
+    </div>
+    <div class="panel">
+      <h3>Measured so far</h3>
+      <div class="row"><span>Distance</span><b id="m_dist">—</b></div>
+      <div class="row"><span>Hazard exposure</span><b id="m_exp">—</b></div>
+      <div class="row"><span>Time at risk ≥ 0.5</span><b id="m_near">—</b></div>
+      <div class="row"><span>Time at risk ≥ 0.92</span><b id="m_in">—</b></div>
+    </div>
+    <div class="panel">
+      <h3>Event log</h3>
+      <div class="events" id="events"></div>
+    </div>
+  </aside>
+</main>
+<script>
+"use strict";
+const cv = document.getElementById("map"), ctx = cv.getContext("2d");
+let S = null, D = null, mode = "fire", layer = "now", view = null;
+
+function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function setSeg(id, attr, cb) {
+  document.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => {
+    document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle("on", x === b));
+    cb(b.dataset[attr]);
+  });
+}
+setSeg("clickmode", "m", m => { mode = m; document.getElementById("hint").textContent =
+  m === "fire" ? "Click the map to start a simulated fire" : "Click the map to send the robot a new goal"; });
+setSeg("layer", "l", l => { layer = l; draw(); });
+
+function fit() {
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  cv.width = r.width * dpr; cv.height = r.height * dpr;
+  if (!S) return;
+  const w = S.width * S.resolution, h = S.height * S.resolution;
+  const sc = Math.min(cv.width / w, cv.height / h) * 0.96;
+  view = { sc, ox: (cv.width - w * sc) / 2, oy: (cv.height - h * sc) / 2, w, h };
+  draw();
+}
+const toPx = (x, y) => [view.ox + (x - S.origin[0]) * view.sc, view.oy + view.h * view.sc - (y - S.origin[1]) * view.sc];
+const toWorld = (px, py) => [S.origin[0] + (px - view.ox) / view.sc, S.origin[1] + (view.h * view.sc - (py - view.oy)) / view.sc];
+const cellC = (c) => [S.origin[0] + (c[0] + 0.5) * S.resolution, S.origin[1] + (c[1] + 0.5) * S.resolution];
+
+function heat(v) {  // 0..1 -> rgba (amber -> orange -> red)
+  const a = Math.min(0.85, 0.15 + 0.75 * v);
+  if (v >= 0.75) return `rgba(255,64,48,${a})`;
+  if (v >= 0.5) return `rgba(255,128,32,${a})`;
+  return `rgba(255,190,40,${a})`;
+}
+function line(pts, color, width, dash) {
+  if (!pts || pts.length < 2) return;
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = "round"; ctx.lineCap = "round";
+  ctx.setLineDash(dash || []); ctx.beginPath();
+  pts.forEach((p, i) => { const [x, y] = toPx(p[0], p[1]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+  ctx.stroke(); ctx.restore();
+}
+function square(c, color, scale, stroke) {
+  const [x, y] = toPx(...cellC(c)), s = S.resolution * view.sc * scale;
+  ctx.fillStyle = color; ctx.fillRect(x - s / 2, y - s / 2, s, s);
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.strokeRect(x - s / 2, y - s / 2, s, s); }
+}
+
+function draw() {
+  if (!S || !view) return;
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  const r = S.resolution * view.sc, blocked = new Set(S.blocked);
+  ctx.fillStyle = "#1a2029"; ctx.fillRect(view.ox, view.oy, view.w * view.sc, view.h * view.sc);
+  const risk = D ? (layer === "now" ? D.risk_now : layer === "truth" ? (D.risk_truth || []) : D.risk_pred) : [];
+  document.getElementById("truthbtn").style.display = D && D.risk_truth && D.risk_truth.length ? "" : "none";
+  for (let i = 0; i < S.width * S.height; i++) {
+    const cx = i % S.width, cy = Math.floor(i / S.width);
+    const [x, y] = toPx(S.origin[0] + cx * S.resolution, S.origin[1] + (cy + 1) * S.resolution);
+    if (blocked.has(i)) { ctx.fillStyle = "#3a4452"; ctx.fillRect(x, y, r + 0.5, r + 0.5); continue; }
+    const v = risk[i] / 100;
+    if (v >= 0.15) { ctx.fillStyle = layer === "pred" ? `rgba(176,124,255,${Math.min(0.8, 0.1 + 0.7 * v)})` : heat(v); ctx.fillRect(x, y, r + 0.5, r + 0.5); }
+  }
+  (S.refuges || []).forEach(c => square(c, "rgba(54,211,153,.35)", 1.6, css("--green")));
+  if (S.base) square(S.base, "rgba(76,141,255,.35)", 1.6, css("--blue"));
+  (S.victims || []).forEach(c => square(c, css("--pink"), 0.9));
+  const done = new Set(D && D.status ? D.status.goals_reached || [] : []);
+  (S.goals || []).forEach((c, i) => square(c, "transparent", 1.3, done.has(i) ? css("--green") : css("--amber")));
+  if (D) {
+    const cmp = D.decision && D.decision.comparison;
+    line(D.ghost, "rgba(139,152,168,.8)", 3, [6, 6]);
+    if (cmp && cmp.shortest_path) line(cmp.shortest_path.route_xy, "rgba(255,77,61,.9)", 3, [10, 7]);
+    line(D.route, css("--cyan"), 5);
+    if (D.robot) {
+      const [x, y] = toPx(D.robot.x, D.robot.y), L = Math.max(14, 0.9 * view.sc);
+      ctx.save(); ctx.translate(x, y); ctx.rotate(-D.robot.yaw);
+      ctx.fillStyle = css("--amber"); ctx.strokeStyle = "#0b0f14"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(L * 0.6, 0); ctx.lineTo(-L * 0.45, L * 0.35); ctx.lineTo(-L * 0.25, 0); ctx.lineTo(-L * 0.45, -L * 0.35);
+      ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
+  }
+}
+
+cv.addEventListener("click", ev => {
+  if (!S || !view) return;
+  const rect = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const [x, y] = toWorld((ev.clientX - rect.left) * dpr, (ev.clientY - rect.top) * dpr);
+  fetch(mode === "fire" ? "/api/fire" : "/api/goal", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ x, y }) });
+});
+const slider = document.getElementById("confslider");
+slider.oninput = () => document.getElementById("confset").textContent = (+slider.value).toFixed(2);
+slider.onchange = () => fetch("/api/confidence", { method: "POST", headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ value: +slider.value }) });
+
+document.getElementById("present").onclick = () => document.body.classList.toggle("present");
+const NARRATIVE = {
+  mission_feasible: ["Route is safe — heading to the victim", "forecast-checked outbound and return routes"],
+  target_route_unavailable: ["No safe way to the victim — moving to a refuge", "every route crosses the hazard limit"],
+  perception_confidence_degraded: ["Sensors degraded — moving to an observation point", "confidence below the continue threshold"],
+  perception_confidence_critical: ["Sensors unreliable — taking refuge", "confidence below the critical threshold"],
+  return_route_unavailable: ["Return path would be cut off — taking refuge", "forecast closes the way back"],
+  return_exposure_over_budget: ["Return too dangerous — taking refuge", "predicted exposure over budget"],
+  outbound_exposure_over_budget: ["Route too dangerous — returning", "predicted exposure over budget"],
+  forecast_horizon_insufficient: ["Hazard forecast too short — not committing", "route exceeds the forecast horizon"],
+  no_safe_route: ["No safe route anywhere — holding position", "abort: no movement goal is sent"],
+  current_cell_critical: ["Robot is in danger — escaping now", "current cell above the hazard limit"],
+  stale_inputs: ["Sensor data stale — stopping", "fail-safe: inputs older than allowed"],
+};
+let lastEvent = "", eventUntil = 0;
+function caption() {
+  const d = D.decision || {}, ev = (D.events || []).slice(-1)[0] || "";
+  const el = document.getElementById("caption");
+  if (ev !== lastEvent) { lastEvent = ev; if (/FIRE|cancelled|Victim/.test(ev)) eventUntil = Date.now() + 4000; }
+  if (Date.now() < eventUntil) {
+    const text = ev.replace(/^t=\s*[\d.]+s\s+/, "");
+    const big = /FIRE/.test(text) ? "Fire detected — re-evaluating routes" : /cancelled/.test(text) ? "Route cancelled — switching to a safer route"
+      : /Victim/.test(text) ? text.replace("reached", "reached ✓") : text;
+    el.innerHTML = `${big}<small>${text}</small>`; el.style.borderLeftColor = /FIRE|cancelled/.test(text) ? css("--red") : css("--green");
+    return;
+  }
+  const n = NARRATIVE[d.reason_code] || [d.explanation || "Waiting for the planner…", d.reason_code || ""];
+  el.innerHTML = `${n[0]}<small>${n[1]}</small>`;
+  el.style.borderLeftColor = d.action === "continue_to_target" ? css("--cyan") : d.action === "abort" ? css("--red") : css("--amber");
+}
+const ACT = { continue_to_target: ["CONTINUE", "a-continue"], seek_refuge: ["SEEK REFUGE", "a-refuge"],
+  slow_and_reassess: ["SLOW & REASSESS", "a-slow"], return_to_base: ["RETURN TO BASE", "a-return"], abort: ["ABORT", "a-abort"] };
+function panels() {
+  const d = D.decision || {}, a = ACT[d.action] || [d.action || "—", ""];
+  const el = document.getElementById("action"); el.textContent = a[0]; el.className = "action " + a[1];
+  document.getElementById("reason").textContent = d.reason_code || "";
+  document.getElementById("explain").textContent = d.explanation || "";
+  document.getElementById("clock").textContent = `t = ${(D.status && D.status.elapsed_s != null ? D.status.elapsed_s : D.t).toFixed(1)} s`;
+  const conf = d.perception_confidence;
+  document.getElementById("confv").textContent = conf == null ? "—" : conf.toFixed(2);
+  const bar = document.getElementById("confbar");
+  bar.style.width = `${(conf || 0) * 100}%`; bar.style.background = conf < 0.3 ? css("--bad") : conf < 0.55 ? css("--warn") : css("--ok");
+  const m = D.metrics || {};
+  document.getElementById("m_dist").textContent = `${(m.distance_m || 0).toFixed(1)} m`;
+  document.getElementById("m_exp").textContent = `${(m.exposure_risk_s || 0).toFixed(1)} risk·s`;
+  document.getElementById("m_near").textContent = `${(m.time_near_s || 0).toFixed(1)} s`;
+  document.getElementById("m_in").textContent = `${(m.time_in_s || 0).toFixed(1)} s`;
+  const st = D.status || {}, steps = document.getElementById("steps"), n = st.goals_total || (S.goals || []).length;
+  steps.innerHTML = "";
+  for (let i = 0; i < n; i++) {
+    const done = (st.goals_reached || []).includes(i), now = st.current_goal && S.goals && S.goals[i] &&
+      st.current_goal[0] === S.goals[i][0] && st.current_goal[1] === S.goals[i][1];
+    steps.insertAdjacentHTML("beforeend", `<div class="step ${done ? "done" : ""} ${now ? "now" : ""}">Point ${i + 1}${done ? " ✓" : ""}</div>`);
+  }
+  const back = st.phase === "returning";
+  steps.insertAdjacentHTML("beforeend", `<div class="step ${back ? "now" : ""}">Base</div>`);
+  document.getElementById("phase").textContent = { outbound: "Searching", returning: "Returning", user_goal: "Operator goal" }[st.phase] || "—";
+  const cmp = d.comparison || {}, rows = [["AegisNav", cmp.aegisnav, css("--cyan")], ["Shortest path", cmp.shortest_path, css("--red")]];
+  const max = Math.max(1, ...rows.map(r => r[1] ? r[1].exposure_risk_s : 0));
+  document.getElementById("cmp").innerHTML = rows.map(([name, v, c]) => v ?
+    `<span>${name}</span><div class="bar"><div style="width:${100 * v.exposure_risk_s / max}%;background:${c}"></div></div>
+     <b>${v.exposure_risk_s.toFixed(1)}</b><span class="note">peak ${v.peak_risk.toFixed(2)} · ${v.length_m.toFixed(1)} m</span>
+     <span class="flag">${v.crosses_hard_limit ? "CROSSES HARD LIMIT" : ""}</span><span></span>` :
+    `<span>${name}</span><span class="note">no route</span><span></span>`).join("");
+  document.getElementById("events").innerHTML = (D.events || []).slice().reverse().map(e => `<div>${e}</div>`).join("");
+}
+
+async function boot() {
+  for (;;) {
+    try { const r = await fetch("/api/static"); const j = await r.json(); if (j.width) { S = j; break; } } catch (e) {}
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  document.getElementById("scenario").textContent = S.scenario || "scenario";
+  fit();
+  const es = new EventSource("/api/stream"), conn = document.getElementById("conn");
+  es.onopen = () => { conn.textContent = "LIVE"; conn.className = "chip live"; };
+  es.onerror = () => { conn.textContent = "reconnecting"; conn.className = "chip"; };
+  es.onmessage = ev => { D = JSON.parse(ev.data); panels(); caption(); draw(); };
+}
+window.addEventListener("resize", fit);
+boot();
+</script>
+</body>
+</html>

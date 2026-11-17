@@ -1,0 +1,62 @@
+aegisnav_hazard_forecast:
+  ros__parameters:
+    use_sim_time: true
+    map_topic: /aegisnav/planning_map   # 0.4 m planning grid (not the 0.05 m /map)
+    forecast_topic: /aegisnav/hazard_forecast
+    # Grid-cell indices for the starter 24x16 map; these are simulated sources,
+    # not live sensor measurements. Replace after confirming your actual map.
+    source_cells_xy: [11, 3, 9, 4]
+    source_intensities: [0.94, 0.42]
+    forecast_steps: 120
+    time_step_s: 1.0
+    spread_rate: 0.24
+    decay_rate: 0.008
+    uncertainty_growth: 0.018
+    update_period_s: 1.0
+    occupied_threshold: 50
+
+aegisnav_risk_planner:
+  ros__parameters:
+    use_sim_time: true
+    map_topic: /aegisnav/planning_map   # 0.4 m planning grid (not the 0.05 m /map)
+    forecast_topic: /aegisnav/hazard_forecast
+    pose_source: tf        # tf | topic (topic = manual /amcl_pose tests)
+    map_frame: map
+    robot_base_frame: base_footprint
+    odom_frame: odom
+    path_spacing_m: 0.1            # metres between published path poses
+    start_snap_tolerance_m: 0.25   # metres; bounded snap of a near-wall pose to a free cell
+    replan_min_improvement: 0.15   # fraction; keep active route unless candidate is this much cheaper
+    pose_topic: /amcl_pose
+    goal_topic: /goal_pose
+    confidence_topic: /aegisnav/perception_confidence
+    path_topic: /aegisnav/planned_path
+    decision_topic: /aegisnav/decision
+    base_cell_xy: [2, 2]
+    refuge_cells_xy: [2, 12, 21, 2, 6, 12]
+    hazard_weight: 12.0
+    uncertainty_weight: 2.5
+    hard_risk_threshold: 0.92
+    nominal_speed_mps: 0.35
+    wall_clearance_penalty_m: 0.3   # metres-equivalent per obstacle-adjacent cell; static preference, not hazard
+    minimum_continue_confidence: 0.55
+    critical_confidence: 0.30
+    max_outbound_exposure: 18.0
+    max_return_exposure: 18.0
+    occupied_threshold: 50
+    execute_with_follow_path: false
+    follow_path_action: /follow_path
+    controller_id: FollowPath
+    goal_checker_id: general_goal_checker
+    progress_checker_id: progress_checker
+
+aegisnav_visualization:
+  ros__parameters:
+    use_sim_time: true
+    world_name: aegisnav_rescue_world
+    map_topic: /aegisnav/planning_map
+    # Must equal the planner's values (asset test); display only.
+    base_cell_xy: [2, 2]
+    refuge_cells_xy: [2, 12, 21, 2, 6, 12]
+    gazebo_tiles: true
+    tile_period_s: 2.0   # seconds between Gazebo hazard-tile refreshes (one model per band)
