@@ -6,7 +6,7 @@ Answers are written so every statement can be backed by the repository. Where so
 
 **30 seconds.** "AegisNav is a simulated rescue robot that decides *whether* to keep going, not only *where* to go. Hazards spread over time and its sensor only sees part of the building, so it plans over a forecast of the hazard, discovers new fires with its own sensor, and chooses between continue, replan, return, shelter in a refuge or abort, with a reason code for every decision. We measured it over repeated full simulated missions against a shortest-path robot."
 
-**2 minutes.** Problem → what makes it hard (hazard spreads, the robot cannot see everything, confidence in its own sensing changes) → what the robot does (forecast, plan through time, check it can still get back, explain every decision) → what we built and tested (ROS 2 + Gazebo + Nav2, 189 unit tests, repeated missions) → what we measured (6 matched full Gazebo missions: 0/6 entered the deadly zone against 6/6 for a shortest-path robot; exposure 6.7 vs 16.8 risk·s) → what it is not (simulation only, synthetic fire model).
+**2 minutes.** Problem → what makes it hard (hazard spreads, the robot cannot see everything, confidence in its own sensing changes) → what the robot does (forecast, plan through time, check it can still get back, explain every decision) → what we built and tested (ROS 2 + Gazebo + Nav2, 189 unit tests, repeated missions) → what we measured (matched full Gazebo missions against a shortest-path robot, including how close each gets to the fire; only two matched runs finished with the final planner) → what it is not (simulation only, synthetic fire model).
 
 ## 2. Problem and motivation
 
@@ -38,16 +38,16 @@ Answers are written so every statement can be backed by the repository. Where so
 
 **How do you know it works?**
 - 189 unit tests (core 133, ROS adapters 40, assets 16) plus 166 ROS package tests in a clean Jazzy container, run by CI.
-- A Gazebo + Nav2 batch study: 6 matched seeds of full headless missions with seeded random fires, measured against the *real* hazard field. AegisNav with onboard sensing completed 6/6 and never entered a cell at risk ≥ 0.92 (0/6, 95% CI 0–39%); the shortest-path baseline entered one in 6/6 runs, briefly (1.5–2.0 s each), and completed 5/6. Mean exposure 6.7 ± 2.7 against 16.8 ± 6.2 risk·s; paired difference −10.1 (95% bootstrap CI −14.9 to −4.7).
+- A Gazebo + Nav2 batch study of matched full missions with seeded random fires, measured against the *real* hazard field. With the final planner (1.5 m fire margin) two matched seeds finished: AegisNav stayed 1.04 and 2.49 m from any burning cell, the shortest-path baseline 0.14 and 0.15 m (through it); AegisNav took longer (459 and 321 s against about 320 s) and had higher exposure than it did without the margin (17.2 and 10.8 against 25.7 and 16.9 for the baseline). An earlier 6-seed study, before the margin, found 0/6 entries to risk >= 0.92 for AegisNav against 6/6 for the baseline, but also found AegisNav passing only 0.6 m from fire; that is why the margin was added (ADR-0010).
 - An earlier 20-seed kinematic study (corridor map): AegisNav never entered a cell at or above the hard limit; the shortest-path baseline did in every trial.
 
 **What is the baseline?** The same planner with hazard and uncertainty weights set to 0, a hard limit of 0.99 and no mission policy (a shortest path). It answers "does hazard awareness help?", not "is Nav2's planner worse?".
 
 **Is that a fair comparison?** Same map, same fires, same seeds, same controller. Not done yet: a reactive baseline that plans on the current hazard layer only (B1 in the research position). That is the fairest test of whether *forecasting* adds value, and we say so.
 
-**How many runs? Is it statistically significant?** Six matched runs per mode (we planned 15 × 4 configurations and cut it for time). That is small, so we report rates with Wilson 95% intervals and a paired bootstrap interval, and we do not claim significance or a percentage improvement. Two other configurations (knows every fire; no triage) ran on only 2 seeds and are not compared.
+**How many runs? Is it statistically significant?** Two matched runs with the final planner (we planned 15 × 4 configurations; the first 6-seed study was of the planner before the fire margin). That is small, so we report rates with Wilson 95% intervals and a paired bootstrap interval, and we do not claim significance or a percentage improvement. Two other configurations (knows every fire; no triage) ran on only 2 seeds and are not compared.
 
-**What failures did you see?** One run in 12 did not complete: the baseline on seed 5 stopped two cells short of the courtyard goal when the controller reported "collision ahead" three times in a row. The goal sits next to a rubble corner; that is a world/controller issue, not a hazard effect, and AegisNav could hit it too. One AegisNav run (seed 2) had a transient controller failure and recovered by replanning. In seed 5 the baseline's exposure was lower only because it did less of the mission. Earlier in development we also found and fixed: a pallet placed 0.6 m off its cells that trapped the robot, wrong travel-time accounting, a console panel that measured exposure against the robot's belief, and a planner that was too slow for the larger map.
+**What failures did you see?** In the earlier 6-seed study one run in 12 did not complete: the baseline on seed 5 stopped two cells short of the courtyard goal when the controller reported "collision ahead" three times in a row. The goal sits next to a rubble corner; that is a world/controller issue, not a hazard effect, and AegisNav could hit it too. One AegisNav run (seed 2) had a transient controller failure and recovered by replanning. In seed 5 the baseline's exposure was lower only because it did less of the mission. Earlier in development we also found and fixed: a pallet placed 0.6 m off its cells that trapped the robot, wrong travel-time accounting, a console panel that measured exposure against the robot's belief, and a planner that was too slow for the larger map.
 
 **Why not a bigger study?** Each mission is a full simulation (about 10 minutes of wall-clock). We chose a matched, reproducible batch over a larger uncontrolled one, and the runner (`tools/run_batch.sh`) scales to more seeds.
 
@@ -88,7 +88,7 @@ Answers are written so every statement can be backed by the repository. Where so
 
 ## 9. Hard questions
 
-**"Your fire isn't real, so what did you prove?"** That, *under a configurable hazard model*, planning over a forecast with an honest sensor model reduced simulated exposure compared with a shortest-path robot in 6 matched full missions (−10.1 risk·s, CI −14.9 to −4.7), and that the integrated stack runs reliably enough to measure. Not that it would rescue anyone.
+**"Your fire isn't real, so what did you prove?"** That, *under a configurable hazard model*, planning over a forecast with an honest sensor model kept the robot clear of the fire and lower in exposure than a shortest-path robot in two matched full missions (illustrative only), and that the integrated stack runs reliably enough to measure. Not that it would rescue anyone.
 
 **"Isn't this just A* with a cost map?"** The A* is the part we can prove optimal. The additions are the time dimension, the return-feasibility check, the belief from a limited sensor, confidence-driven decisions with reasons, and an evaluation harness that measures them in the real stack.
 
@@ -105,3 +105,7 @@ Answers are written so every statement can be backed by the repository. Where so
 3. (35–55 s) Triage: it picks the next inspection point by lowest-exposure safe route; a victim is found.
 4. (55–75 s) The shortest-path robot on the same fires: enters the deadly zone.
 5. (75–90 s) Results slide: the 6-seed numbers above, then the limits card.
+
+## 11. Added after reviewing the demo video
+
+**"The robot drove over the fire in your video."** Correct for the first version: it detected the fires and replanned, but the planner only forbade the deadliest cells, so it could pass 0.6 m from a burning cell. We measured that (closest approach per run), added a 1.5 m margin (ADR-0010), re-ran, and re-recorded. The margin is a simulation rule, not a validated safety distance, and it makes missions longer.

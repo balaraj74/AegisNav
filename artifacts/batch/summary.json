@@ -1,0 +1,54 @@
+{
+ "sensing": {
+  "runs": 2,
+  "outcomes": {
+   "complete": 2
+  },
+  "complete": 2,
+  "reached_base": 2,
+  "entered_hard_risk": 0,
+  "failed": 0,
+  "complete_ci": [
+   0.34237195288961925,
+   1.0
+  ],
+  "entered_hard_risk_ci": [
+   0.0,
+   0.6576280471103807
+  ],
+  "exposure_by_seed": {
+   "1": 17.2,
+   "2": 10.85
+  },
+  "hard_time_by_seed": {
+   "1": 0.0,
+   "2": 0.0
+  }
+ },
+ "baseline": {
+  "runs": 2,
+  "outcomes": {
+   "complete": 2
+  },
+  "complete": 2,
+  "reached_base": 2,
+  "entered_hard_risk": 2,
+  "failed": 0,
+  "complete_ci": [
+   0.34237195288961925,
+   1.0
+  ],
+  "entered_hard_risk_ci": [
+   0.34237195288961925,
+   1.0
+  ],
+  "exposure_by_seed": {
+   "1": 25.66,
+   "2": 16.95
+  },
+  "hard_time_by_seed": {
+   "1": 2.0,
+   "2": 1.5
+  }
+ }
+}

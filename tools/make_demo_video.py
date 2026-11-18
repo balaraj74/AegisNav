@@ -258,8 +258,9 @@ def main() -> None:
                                      ("Simulation only (ROS 2 Jazzy, Gazebo Harmonic, Nav2). Not certified rescue equipment.", 32, REG, 300, "0x9fb0c3"),
                                      ("Fire, gas and smoke come from a synthetic forecast model, not fire physics.", 32, REG, 350, "0x9fb0c3"),
                                      ("The sensor and perception confidence are simulated models, not calibrated measurements.", 32, REG, 400, "0x9fb0c3"),
-                                     ("Results are from a small number of matched simulated runs, not statistical proof.", 32, REG, 450, "0x9fb0c3"),
-                                     ("Code, tests, decisions and every run's data: the repository (docs/, artifacts/batch/).", 30, REG, 600, "white"),
+                                     ("The planner keeps at least 1.5 m from burning cells (a simulation rule, not a validated safety distance).", 32, REG, 450, "0x9fb0c3"),
+                                     ("Results come from two matched simulated runs: illustrative, not statistical proof.", 32, REG, 500, "0x9fb0c3"),
+                                     ("Code, tests, decisions and every run's data: the repository (docs/, artifacts/batch/).", 30, REG, 640, "white"),
                                      ("3D models: Gazebo Fuel, Open Robotics (CC0). Fog Emitter texture: Open Robotics (CC BY 4.0).", 24, REG, 760, "0x7d8fa3")], 9))
     lst = work / "list.txt"
     lst.write_text("".join(f"file '{p.resolve()}'\n" for p in parts))

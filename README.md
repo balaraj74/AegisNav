@@ -229,8 +229,12 @@ Genuine frames from the Gazebo GUI (Xvfb in the container, Intel GPU via Mesa, n
 
 Not yet measured: frame rate on the laptop's display, and a 20-trial study in this world (the 20-trial study covers the corridor scenario in the kinematic runner).
 
-## Evidence: repeated full missions (2026-11-17)
+## Evidence: repeated full missions (2026-11-17/18)
 
-`tools/run_batch.sh` runs complete headless Gazebo/Nav2 missions in isolated containers with seeded random fires and measures exposure against the **real** hazard field. On 6 matched seeds, AegisNav with onboard sensing completed 6/6 missions and never entered a cell at risk ≥ 0.92 (0/6); a hazard-blind shortest-path baseline entered one in 6/6 runs, briefly, and completed 5/6. Mean exposure 6.7 ± 2.7 against 16.8 ± 6.2 risk·s (paired difference −10.1, 95% bootstrap CI −14.9 to −4.7).
+`tools/run_batch.sh` runs complete headless Gazebo/Nav2 missions in isolated containers with seeded random fires and measures exposure and the closest approach to fire against the **real** hazard field.
 
-This is a small simulation study against a simple baseline, on a synthetic hazard model; it is not statistical proof and no percentage improvement is claimed. Full tables: `docs/simulation/batch_results.md`; interpretation, the one failure and the limits: `docs/simulation/batch_findings.md`; method: ADR-0009. Viva/hackathon answers: `docs/presentation/viva_qa.md`. Next steps: `docs/backlog/next_phase_roadmap.md`.
+- **First study (6 matched seeds, planner without a fire margin):** AegisNav completed 6/6 and never entered a cell at risk >= 0.92; a hazard-blind shortest-path baseline entered one in 6/6 runs. But reviewing the demo video showed AegisNav passing only about 0.6 m from burning cells, which looks like driving over the fire. That study is kept (`docs/simulation/*_v1_no_standoff.md`) and is no longer the headline.
+- **Fix (ADR-0010):** the planner now keeps at least 1.5 m from any burning cell.
+- **Current planner:** only 2 matched seeds finished before the study was stopped for time. AegisNav stayed 1.04 and 2.49 m from fire (baseline: 0.14 and 0.15 m), at the cost of longer missions (459 and 321 s against about 320 s) and higher exposure than before (17.2 and 10.8 risk.s; baseline 25.7 and 16.9). Two runs are illustrative, not statistical evidence.
+
+Details and limits: `docs/simulation/batch_findings.md`; method: ADR-0009. Viva/hackathon answers: `docs/presentation/viva_qa.md`. Next steps: `docs/backlog/next_phase_roadmap.md`.

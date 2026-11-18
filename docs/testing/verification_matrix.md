@@ -152,3 +152,13 @@ Rendering: Intel iGPU via `/dev/dri` (Mesa iris), headless sensors; GUI runs on 
 | Stale-pose stops | 0 in all runs | run logs |
 | Omniscient and no-triage configurations | 2 seeds each only: **too few to compare** | same |
 | Not done | reactive (current-layer) baseline; more than 6 seeds; hysteresis ablation; runs on the laptop GPU | ADR-0009 |
+
+## Correction 2026-11-18: closeness to fire and the margin (ADR-0010)
+
+| Check | Result | Evidence |
+|---|---|---|
+| First batch (no margin): closest approach to a burning cell | AegisNav 0.60-0.66 m (seeds 4-6, the runs that recorded positions); baseline 0.17-0.24 m. The "0/6 entered risk >= 0.92" result in the section above is true but does not capture this. | `artifacts/batch_v1_no_standoff/` |
+| Planner with margin 0 vs the previous planner | identical on 120 random queries | `~/aegisnav_work/equiv_standoff.py` (outside repo) |
+| Margin unit tests | keeps the route out of the zone, allows escape, does not spread through walls, validation | `test_regression.py` |
+| Gazebo, margin 2 cells, seeds 1-2 (both modes) | AegisNav closest approach 2.49 and 1.04 m, never at risk >= 0.92, completed; baseline 0.14 and 0.15 m, completed. AegisNav missions longer (459, 321 s) and exposure 17.2, 10.8 (baseline 25.7, 16.9) | `docs/simulation/batch_results.md` |
+| Not done | seeds 3-6 (stopped for time); intervals; reactive baseline | `docs/simulation/batch_findings.md` |
